@@ -7,8 +7,11 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
 import { AuthModule } from '../auth/auth.module';
 import { GuardrailModule } from '../guardrail/guardrail.module';
 
+import { ChatController } from './chat.controller';
+
 @Module({
   imports: [KnowledgeModule, AuthModule, GuardrailModule],
+  controllers: [ChatController],
   providers: [ChatGateway, ChatService, RetrievalService, LlmService],
   exports: [ChatService, RetrievalService, LlmService],
 })
