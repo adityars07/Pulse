@@ -1,6 +1,7 @@
 {
   "extends": "@groundeddesk/tsconfig/nestjs.json",
   "compilerOptions": {
+    "incremental": false,
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./",
