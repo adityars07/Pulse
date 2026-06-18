@@ -179,9 +179,8 @@ export class AuthService {
    * Returns the tenant associated with the API key.
    */
   async validateApiKey(key: string) {
-    const keyHash = await bcrypt.hash(key, 10);
     // We need to search by prefix since we store hashed keys
-    const prefix = key.substring(0, 8);
+    const prefix = key.substring(0, 16);
 
     const apiKey = await this.prisma.apiKey.findFirst({
       where: { keyPrefix: prefix },
@@ -213,7 +212,7 @@ export class AuthService {
   async generateApiKey(tenantId: string, name: string) {
     const rawKey = `gd_live_${this.generateRandomString(32)}`;
     const keyHash = await bcrypt.hash(rawKey, 10);
-    const keyPrefix = rawKey.substring(0, 8);
+    const keyPrefix = rawKey.substring(0, 16);
 
     const apiKey = await this.prisma.apiKey.create({
       data: {
