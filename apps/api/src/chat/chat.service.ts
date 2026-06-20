@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RetrievalService, RetrievedChunk } from './retrieval.service';
 import { LlmService, computeTokenCost } from './llm.service';
@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { InjectionFilter } from '../guardrail/injection-filter';
 import { PiiRedactor } from '../guardrail/pii-redactor';
 import { LangfuseService } from '../observability/langfuse.service';
+import { BillingService } from '../billing/billing.service';
 
 export interface ChatResult {
   conversationId: string;
@@ -32,6 +33,7 @@ export class ChatService {
     private readonly injectionFilter: InjectionFilter,
     private readonly piiRedactor: PiiRedactor,
     private readonly langfuseService: LangfuseService,
+    @Optional() private readonly billingService?: BillingService,
   ) {}
 
   /**
@@ -212,6 +214,11 @@ export class ChatService {
             totalCost: tokenCost,
             operation: `chat:${providerName}`,
           },
+        });
+
+        // Report 1 usage record to Stripe (metered billing) — non-blocking
+        this.billingService?.reportUsage(tenantId, 1).catch(() => {
+          // Intentionally silent: billing failure must not disrupt chat
         });
 
         return {

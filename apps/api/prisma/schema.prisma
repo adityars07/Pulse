@@ -29,6 +29,7 @@ model Tenant {
   messages         Message[]
   apiKeys          ApiKey[]
   costLogs         CostLog[]
+  stripeCustomer   StripeCustomer?
 
   @@map("tenants")
 }
@@ -217,3 +218,32 @@ model CostLog {
   @@index([conversationId])
   @@map("cost_logs")
 }
+
+// ── Stripe Billing ───────────────────────────────────────────
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+  INCOMPLETE
+}
+
+model StripeCustomer {
+  id                 String             @id @default(uuid()) @db.Uuid
+  tenantId           String             @unique @map("tenant_id") @db.Uuid
+  customerId         String             @unique @map("customer_id")     // Stripe cus_xxx
+  subscriptionId     String?            @map("subscription_id")         // Stripe sub_xxx
+  subscriptionItemId String?            @map("subscription_item_id")    // Stripe si_xxx (metered)
+  priceId            String?            @map("price_id")
+  status             SubscriptionStatus @default(TRIALING)
+  currentPeriodEnd   DateTime?          @map("current_period_end")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@map("stripe_customers")
+}
+
