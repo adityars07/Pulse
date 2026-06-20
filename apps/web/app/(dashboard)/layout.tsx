@@ -15,6 +15,7 @@ import {
   X,
   User,
   ChevronDown,
+  Headphones,
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -57,6 +58,7 @@ export default function DashboardLayout({
     { name: 'Overview', href: '/', icon: LayoutDashboard },
     { name: 'Knowledge Base', href: '/sources', icon: Database },
     { name: 'Conversations', href: '/conversations', icon: MessageSquare },
+    { name: 'Agent Inbox', href: '/agent', icon: Headphones },
     { name: 'Observability', href: '/observability', icon: Activity },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];

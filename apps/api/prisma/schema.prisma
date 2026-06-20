@@ -128,14 +128,15 @@ enum ConversationStatus {
 }
 
 model Conversation {
-  id          String             @id @default(uuid()) @db.Uuid
-  tenantId    String             @map("tenant_id") @db.Uuid
-  sessionId   String             @map("session_id")
-  visitorInfo Json               @default("{}") @map("visitor_info")
-  status      ConversationStatus @default(ACTIVE)
-  rating      Int?               // 1 = thumbs down, 5 = thumbs up
-  createdAt   DateTime           @default(now()) @map("created_at")
-  updatedAt   DateTime           @updatedAt @map("updated_at")
+  id              String             @id @default(uuid()) @db.Uuid
+  tenantId        String             @map("tenant_id") @db.Uuid
+  sessionId       String             @map("session_id")
+  visitorInfo     Json               @default("{}") @map("visitor_info")
+  status          ConversationStatus @default(ACTIVE)
+  rating          Int?               // 1 = thumbs down, 5 = thumbs up
+  assignedAgentId String?            @map("assigned_agent_id") @db.Uuid // Set when agent takes over
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   messages Message[]
@@ -144,6 +145,7 @@ model Conversation {
   @@index([tenantId])
   @@index([tenantId, status])
   @@index([sessionId])
+  @@index([assignedAgentId])
   @@map("conversations")
 }
 
@@ -152,6 +154,7 @@ model Conversation {
 enum MessageRole {
   USER
   ASSISTANT
+  AGENT   // Human support agent (live takeover)
   SYSTEM
 }
 

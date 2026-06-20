@@ -13,6 +13,8 @@ import { ChatService } from './chat.service';
 import { AuthService } from '../auth/auth.service';
 import { TenantAwarePrismaService } from '../prisma/tenant-aware-prisma.service';
 import { ConfidenceService } from '../guardrail/confidence.service';
+import { AgentGateway } from '../agent/agent.gateway';
+import { ConversationStatus } from '@prisma/client';
 
 interface AuthenticatedSocket extends Socket {
   tenantId?: string;
@@ -33,6 +35,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly authService: AuthService,
     private readonly tenantAwarePrisma: TenantAwarePrismaService,
     private readonly confidenceService: ConfidenceService,
+    private readonly agentGateway: AgentGateway,
   ) {}
 
   async handleConnection(client: AuthenticatedSocket) {
@@ -50,12 +53,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       // Validate API key and resolve tenant
       const tenant = await this.authService.validateApiKey(apiKey as string);
+
+      // ── Per-tenant CORS origin pinning (Phase 16) ─────────────────────
+      const settings = (tenant.settings as any) || {};
+      const allowedOrigins: string[] = settings.allowedOrigins || [];
+      if (allowedOrigins.length > 0) {
+        const origin = client.handshake.headers.origin || '';
+        if (!allowedOrigins.includes(origin)) {
+          this.logger.warn(
+            `CORS_REJECTED: origin "${origin}" not in allowedOrigins for tenant ${tenant.slug}`,
+          );
+          client.emit('error', { code: 'CORS_REJECTED', message: 'Origin not allowed' });
+          client.disconnect();
+          return;
+        }
+      }
+
       client.tenantId = tenant.id;
       client.sessionId = client.handshake.auth?.sessionId || client.id;
 
-      this.logger.log(
-        `Client ${client.id} connected to tenant ${tenant.slug}`,
-      );
+      // Join the conversation room for agent fan-out
+      this.logger.log(`Client ${client.id} connected to tenant ${tenant.slug}`);
 
       client.emit('connected', {
         tenantId: tenant.id,
@@ -137,6 +155,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           confidence: completion.confidence,
         });
       }
+
+      // Fan out customer message to any agent watching this conversation
+      this.agentGateway.broadcastCustomerMessage(result.conversationId, data.text);
     } catch (error: any) {
       if (error instanceof Error && error.message === 'PROMPT_INJECTION_DETECTED') {
         client.emit('error', {
@@ -174,6 +195,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('feedback-received', { success: true });
     } catch (error) {
       this.logger.error(`Feedback error: ${error}`);
+    }
+  }
+
+  /**
+   * Widget escalates the conversation to a human agent.
+   * Marks the conversation ESCALATED so the agent dashboard shows it.
+   */
+  @SubscribeMessage('escalate')
+  async handleEscalate(
+    @MessageBody() data: { conversationId: string; reason?: string },
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    if (!client.tenantId) throw new WsException('Not authenticated');
+
+    try {
+      await this.tenantAwarePrisma.withExplicitTenant(client.tenantId, async (prisma) => {
+        await prisma.conversation.update({
+          where: { id: data.conversationId },
+          data: { status: ConversationStatus.ESCALATED },
+        });
+      });
+
+      client.emit('escalated', {
+        conversationId: data.conversationId,
+        message: 'A human agent has been notified. Please hold on.',
+      });
+
+      this.logger.log(
+        `Conversation ${data.conversationId} escalated (reason: ${data.reason ?? 'user request'})`,
+      );
+    } catch (error) {
+      this.logger.error(`Escalation error: ${error}`);
     }
   }
 }

@@ -175,6 +175,21 @@ export class AuthService {
   }
 
   /**
+   * Verify a JWT token string and return the payload.
+   * Used by AgentGateway to authenticate admin users connecting over WebSockets.
+   */
+  async verifyToken(token: string): Promise<JwtPayload & { name?: string; email?: string }> {
+    try {
+      const payload = this.jwtService.verify<JwtPayload>(token);
+      // Fetch the user to attach name
+      const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+      return { ...payload, name: user?.name ?? undefined, email: user?.email ?? payload.email };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
+  /**
    * Validate API key for widget authentication.
    * Returns the tenant associated with the API key.
    */

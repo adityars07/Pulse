@@ -8,10 +8,11 @@ import { AnthropicProvider } from './providers/anthropic.provider';
 import { KnowledgeModule } from '../knowledge/knowledge.module';
 import { AuthModule } from '../auth/auth.module';
 import { GuardrailModule } from '../guardrail/guardrail.module';
+import { AgentModule } from '../agent/agent.module';
 import { ChatController } from './chat.controller';
 
 @Module({
-  imports: [KnowledgeModule, AuthModule, GuardrailModule],
+  imports: [KnowledgeModule, AuthModule, GuardrailModule, AgentModule],
   controllers: [ChatController],
   providers: [
     // LLM providers (order matters: AnthropicProvider depends on OpenAIProvider)
