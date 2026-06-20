@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RetrievalService, RetrievedChunk } from './retrieval.service';
-import { LlmService } from './llm.service';
+import { LlmService, computeTokenCost } from './llm.service';
 import { MessageRole } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectionFilter } from '../guardrail/injection-filter';
@@ -132,12 +132,13 @@ export class ChatService {
       tenant?.settings,
     );
 
-    // Stream completion
+    // Stream completion — provider selected from tenant settings (openai | anthropic)
     const messageId = uuidv4();
-    const { stream, getUsage } = await this.llmService.streamCompletion(
+    const { stream, getUsage, providerName, modelName } = await this.llmService.streamCompletion(
       systemPrompt,
       redactedUserMessage,
       conversationHistory.slice(0, -1), // Exclude the just-added user message
+      tenant?.settings,
     );
 
     let fullResponse = '';
@@ -160,12 +161,12 @@ export class ChatService {
         const confidence = this.llmService.extractConfidence(fullResponse);
         const cleanedResponse = this.llmService.cleanResponse(fullResponse);
 
-        // Calculate cost (GPT-4o pricing: $2.50/1M input, $10/1M output)
-        const inputCostPerToken = 0.0000025;
-        const outputCostPerToken = 0.00001;
-        const tokenCost =
-          usage.promptTokens * inputCostPerToken +
-          usage.completionTokens * outputCostPerToken;
+        // Calculate cost using per-model rates (works for GPT-4o, Claude, etc.)
+        const tokenCost = computeTokenCost(
+          modelName,
+          usage.promptTokens,
+          usage.completionTokens,
+        );
 
         // Save assistant message
         await this.prisma.message.create({
@@ -200,16 +201,16 @@ export class ChatService {
           });
         }
 
-        // Log cost
+        // Log cost — records actual provider and model used (supports multi-provider)
         await this.prisma.costLog.create({
           data: {
             tenantId,
             conversationId: conversation.id,
-            model: 'gpt-4o',
+            model: modelName,
             promptTokens: usage.promptTokens,
             completionTokens: usage.completionTokens,
             totalCost: tokenCost,
-            operation: 'chat',
+            operation: `chat:${providerName}`,
           },
         });
 
