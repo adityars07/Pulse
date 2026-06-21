@@ -73,18 +73,19 @@ export default function App() {
 
     socketInstance.connect();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     socketInstance.on('connected', (data: { tenantId: string; tenantName: string; settings: any }) => {
       setConnected(true);
       const settings = data.settings || {};
-      if (settings.widgetColor) setWidgetColor(settings.widgetColor);
-      if (settings.widgetPosition) setWidgetPosition(settings.widgetPosition);
+      if (settings.widgetColor) setWidgetColor(settings.widgetColor as string);
+      if (settings.widgetPosition) setWidgetPosition(settings.widgetPosition as 'bottom-left' | 'bottom-right');
 
       // Initialize welcome message
       setMessages([
         {
           id: 'welcome',
           role: 'assistant',
-          content: settings.welcomeMessage || 'Hi! How can I help you today?',
+          content: (settings.welcomeMessage as string) || 'Hi! How can I help you today?',
         },
       ]);
     });
@@ -143,6 +144,7 @@ export default function App() {
       setConnected(false);
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSocket(socketInstance);
 
     return () => {
