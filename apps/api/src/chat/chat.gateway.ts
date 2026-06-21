@@ -14,6 +14,7 @@ import { AuthService } from '../auth/auth.service';
 import { TenantAwarePrismaService } from '../prisma/tenant-aware-prisma.service';
 import { ConfidenceService } from '../guardrail/confidence.service';
 import { AgentGateway } from '../agent/agent.gateway';
+import { CopilotService } from './copilot.service';
 import { ConversationStatus } from '@prisma/client';
 
 interface AuthenticatedSocket extends Socket {
@@ -36,6 +37,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly tenantAwarePrisma: TenantAwarePrismaService,
     private readonly confidenceService: ConfidenceService,
     private readonly agentGateway: AgentGateway,
+    private readonly copilotService: CopilotService,
   ) {}
 
   async handleConnection(client: AuthenticatedSocket) {
@@ -159,6 +161,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       // Fan out customer message to any agent watching this conversation
       this.agentGateway.broadcastCustomerMessage(result.conversationId, data.text);
+
+      // Trigger background suggestion generation for the agent co-pilot (runs async)
+      this.copilotService.generateSuggestionAndEmit(
+        result.conversationId,
+        data.text,
+        this.agentGateway.server,
+      ).catch((err) => this.logger.error('Copilot suggestion generation failed', err));
     } catch (error: any) {
       if (error instanceof Error && error.message === 'PROMPT_INJECTION_DETECTED') {
         client.emit('error', {

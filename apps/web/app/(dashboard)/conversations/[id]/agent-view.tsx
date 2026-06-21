@@ -23,6 +23,7 @@ export default function AgentView({ conversationId, onResolve }: AgentViewProps)
   const [inputText, setInputText] = useState('');
   const [status, setStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
   const [agentName, setAgentName] = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const socketRef = useRef<Socket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -57,6 +58,11 @@ export default function AgentView({ conversationId, onResolve }: AgentViewProps)
         ...prev,
         { role: 'USER', content: data.text, createdAt: data.createdAt },
       ]);
+      setSuggestions([]); // Clear old suggestions on new message
+    });
+
+    socket.on('copilot:suggestions', (data: { suggestions: string[] }) => {
+      setSuggestions(data.suggestions);
     });
 
     socket.on('agent-message', (data: { text: string; agentName: string; createdAt: string }) => {
@@ -85,6 +91,7 @@ export default function AgentView({ conversationId, onResolve }: AgentViewProps)
     if (!inputText.trim() || !socketRef.current) return;
     socketRef.current.emit('agent-message', { conversationId, text: inputText });
     setInputText('');
+    setSuggestions([]); // Clear suggestions after replying
   };
 
   const resolveConversation = () => {
@@ -130,7 +137,7 @@ export default function AgentView({ conversationId, onResolve }: AgentViewProps)
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 flex flex-col">
         {messages.length === 0 && (
           <div className="text-center text-slate-500 text-sm mt-8">
             Waiting for conversation history…
@@ -154,6 +161,28 @@ export default function AgentView({ conversationId, onResolve }: AgentViewProps)
         ))}
         <div ref={bottomRef} />
       </div>
+
+      {/* Copilot Suggestions */}
+      {suggestions.length > 0 && (
+        <div className="px-4 py-2.5 bg-slate-800/80 border-t border-slate-700/60 flex flex-col gap-2 shrink-0">
+          <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">AI Suggested Replies (Click to apply)</span>
+          <div className="flex flex-col gap-2">
+            {suggestions.map((sug, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setInputText(sug);
+                  setSuggestions([]);
+                }}
+                className="px-3.5 py-2 text-xs text-left bg-slate-900 border border-slate-700/60 rounded-xl hover:bg-slate-950 text-slate-200 hover:text-white transition-all cursor-pointer w-full leading-relaxed"
+                title={sug}
+              >
+                {sug}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Input */}
       <div className="px-4 py-3 bg-slate-800 border-t border-slate-700 flex gap-2">

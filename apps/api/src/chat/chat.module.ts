@@ -11,6 +11,7 @@ import { GuardrailModule } from '../guardrail/guardrail.module';
 import { AgentModule } from '../agent/agent.module';
 import { BillingModule } from '../billing/billing.module';
 import { ChatController } from './chat.controller';
+import { CopilotService } from './copilot.service';
 
 @Module({
   imports: [KnowledgeModule, AuthModule, GuardrailModule, AgentModule, BillingModule],
@@ -24,7 +25,8 @@ import { ChatController } from './chat.controller';
     RetrievalService,
     ChatService,
     ChatGateway,
+    CopilotService,
   ],
-  exports: [ChatService, RetrievalService, LlmService],
+  exports: [ChatService, RetrievalService, LlmService, CopilotService],
 })
 export class ChatModule {}
