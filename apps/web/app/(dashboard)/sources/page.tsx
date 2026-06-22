@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { apiRequest, getToken } from '../../lib/api';
+import { apiRequest, getToken, API_BASE_URL } from '../../lib/api';
 import {
   Database,
   Upload,
@@ -48,6 +48,7 @@ export default function SourcesPage() {
     try {
       const data = await apiRequest('/knowledge');
       setSources(data);
+      setError('');
     } catch (err) {
       const errorVal = err as Error;
       setError(errorVal.message || 'Failed to fetch knowledge sources.');
@@ -89,7 +90,7 @@ export default function SourcesPage() {
       formData.append('file', file);
       formData.append('name', fileName);
 
-      const response = await fetch('http://localhost:3000/api/knowledge/upload', {
+      const response = await fetch(`${API_BASE_URL}/knowledge/upload`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
