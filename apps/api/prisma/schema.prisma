@@ -30,6 +30,7 @@ model Tenant {
   apiKeys          ApiKey[]
   costLogs         CostLog[]
   stripeCustomer   StripeCustomer?
+  auditLogs        AuditLog[]
 
   @@map("tenants")
 }
@@ -39,7 +40,8 @@ model Tenant {
 enum UserRole {
   OWNER
   ADMIN
-  MEMBER
+  AGENT
+  VIEWER
 }
 
 model User {
@@ -47,14 +49,15 @@ model User {
   tenantId  String   @map("tenant_id") @db.Uuid
   email     String
   name      String?
-  role      UserRole @default(MEMBER)
+  role      UserRole @default(VIEWER)
   avatar    String?
   password  String?  // Null for OAuth-only users
   provider  String?  // 'google', 'email', etc.
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  auditLogs AuditLog[]
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -252,5 +255,25 @@ model StripeCustomer {
 
   @@index([customerId])
   @@map("stripe_customers")
+}
+
+// ── Audit Log ────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  userEmail String?  @map("user_email")
+  action    String
+  details   String?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([createdAt])
+  @@map("audit_logs")
 }
 

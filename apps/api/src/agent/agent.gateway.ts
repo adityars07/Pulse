@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { PrismaService } from '../prisma/prisma.service';
 import { TenantAwarePrismaService } from '../prisma/tenant-aware-prisma.service';
 import { AuthService } from '../auth/auth.service';
-import { MessageRole, ConversationStatus } from '@prisma/client';
+import { MessageRole, ConversationStatus, UserRole } from '@prisma/client';
 import { ChatService } from '../chat/chat.service';
 import { ToolExecutorService } from '../chat/tools/tool-executor.service';
 
@@ -21,6 +21,7 @@ interface AgentSocket extends Socket {
   tenantId?: string;
   agentId?: string;
   agentName?: string;
+  agentRole?: UserRole;
 }
 
 /**
@@ -82,9 +83,10 @@ export class AgentGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.tenantId = payload.tenantId;
       client.agentId = payload.sub;
       client.agentName = payload.name || payload.email || 'Agent';
+      client.agentRole = payload.role;
 
       this.logger.log(`Agent ${client.agentName} (${client.agentId}) connected`);
-      client.emit('connected', { agentId: client.agentId, agentName: client.agentName });
+      client.emit('connected', { agentId: client.agentId, agentName: client.agentName, agentRole: client.agentRole });
     } catch (err) {
       this.logger.warn(`Agent auth failed: ${err}`);
       client.emit('error', { code: 'AUTH_FAILED', message: 'Invalid token' });
@@ -114,6 +116,10 @@ export class AgentGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     if (!client.tenantId || !client.agentId) {
       throw new WsException('Not authenticated');
+    }
+
+    if (client.agentRole === UserRole.VIEWER) {
+      throw new WsException('Unauthorized: Viewers cannot take over conversations');
     }
 
     const conversation = await this.prisma.conversation.findFirst({
@@ -173,6 +179,10 @@ export class AgentGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException('Not authenticated');
     }
 
+    if (client.agentRole === UserRole.VIEWER) {
+      throw new WsException('Unauthorized: Viewers cannot send messages');
+    }
+
     if (!data?.text?.trim()) {
       client.emit('error', { code: 'EMPTY_MESSAGE', message: 'Message cannot be empty' });
       return;
@@ -212,6 +222,10 @@ export class AgentGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     if (!client.tenantId) throw new WsException('Not authenticated');
 
+    if (client.agentRole === UserRole.VIEWER) {
+      throw new WsException('Unauthorized: Viewers cannot resolve conversations');
+    }
+
     await this.tenantAwarePrisma.withExplicitTenant(client.tenantId, async (prisma) => {
       await prisma.conversation.update({
         where: { id: data.conversationId },
@@ -237,6 +251,10 @@ export class AgentGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     if (!client.tenantId || !client.agentId) {
       throw new WsException('Not authenticated');
+    }
+
+    if (client.agentRole === UserRole.VIEWER) {
+      throw new WsException('Unauthorized: Viewers cannot approve tool calls');
     }
 
     this.logger.log(`Agent approved tool call ${data.name} for conversation ${data.conversationId}`);

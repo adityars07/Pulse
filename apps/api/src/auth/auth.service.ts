@@ -248,6 +248,89 @@ export class AuthService {
     };
   }
 
+  async listTeamMembers(tenantId: string) {
+    return this.prisma.user.findMany({
+      where: { tenantId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        avatar: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async inviteTeamMember(tenantId: string, dto: { email: string; name?: string; role: UserRole; password?: string }) {
+    const existing = await this.prisma.user.findFirst({
+      where: { email: dto.email },
+    });
+    if (existing) {
+      throw new ConflictException('A user with this email already exists');
+    }
+    const defaultPassword = dto.password || 'TemporaryPassword123!';
+    const hashedPassword = await bcrypt.hash(defaultPassword, 12);
+    return this.prisma.user.create({
+      data: {
+        tenantId,
+        email: dto.email,
+        name: dto.name,
+        role: dto.role,
+        password: hashedPassword,
+        provider: 'email',
+      },
+    });
+  }
+
+  async updateMemberRole(tenantId: string, userId: string, targetUserId: string, role: UserRole) {
+    const targetUser = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
+    if (!targetUser || targetUser.tenantId !== tenantId) {
+      throw new ConflictException('User not found in this tenant');
+    }
+    if (userId === targetUserId) {
+      throw new ConflictException('You cannot change your own role');
+    }
+    if (targetUser.role === UserRole.OWNER && role !== UserRole.OWNER) {
+      const ownersCount = await this.prisma.user.count({
+        where: { tenantId, role: UserRole.OWNER },
+      });
+      if (ownersCount <= 1) {
+        throw new ConflictException('Cannot demote the last owner of the workspace');
+      }
+    }
+    return this.prisma.user.update({
+      where: { id: targetUserId },
+      data: { role },
+    });
+  }
+
+  async removeTeamMember(tenantId: string, userId: string, targetUserId: string) {
+    const targetUser = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
+    if (!targetUser || targetUser.tenantId !== tenantId) {
+      throw new ConflictException('User not found in this tenant');
+    }
+    if (userId === targetUserId) {
+      throw new ConflictException('You cannot remove yourself');
+    }
+    if (targetUser.role === UserRole.OWNER) {
+      const ownersCount = await this.prisma.user.count({
+        where: { tenantId, role: UserRole.OWNER },
+      });
+      if (ownersCount <= 1) {
+        throw new ConflictException('Cannot remove the last owner of the workspace');
+      }
+    }
+    return this.prisma.user.delete({
+      where: { id: targetUserId },
+    });
+  }
+
   private generateToken(user: { id: string; email: string; tenantId: string; role: UserRole }) {
     const payload: JwtPayload = {
       sub: user.id,

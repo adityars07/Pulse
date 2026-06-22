@@ -1,9 +1,13 @@
 import { Controller, Get, Post, UseGuards, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { TenantAwarePrismaService } from '../prisma/tenant-aware-prisma.service';
 import { CostTrackerService } from './cost-tracker.service';
 import { GapAnalyzerService } from './gap-analyzer.service';
+import { AuditLogService } from './audit-log.service';
 
 @Controller('observability')
 @UseGuards(JwtAuthGuard)
@@ -12,6 +16,7 @@ export class ObservabilityController {
     private readonly tenantAwarePrisma: TenantAwarePrismaService,
     private readonly costTracker: CostTrackerService,
     private readonly gapAnalyzer: GapAnalyzerService,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   /**
@@ -125,5 +130,21 @@ export class ObservabilityController {
   @Post('gaps/analyze')
   async triggerAnalysis(@CurrentUser() user: any) {
     return this.gapAnalyzer.analyzeGaps(user.tenantId);
+  }
+
+  /**
+   * Retrieve audit logs (restricted to OWNER or ADMIN).
+   */
+  @Get('audit-logs')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  async getAuditLogs(
+    @CurrentUser() user: any,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    const lim = limit ? parseInt(limit, 10) : 50;
+    const off = offset ? parseInt(offset, 10) : 0;
+    return this.auditLogService.getLogs(user.tenantId, lim, off);
   }
 }

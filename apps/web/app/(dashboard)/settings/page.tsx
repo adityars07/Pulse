@@ -16,6 +16,9 @@ import {
   Activity,
   Sliders,
   Sparkles,
+  Users,
+  Shield,
+  UserMinus,
 } from 'lucide-react';
 
 interface TenantSettings {
@@ -34,11 +37,15 @@ interface ApiKey {
 }
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<'general' | 'keys' | 'widget'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'keys' | 'widget' | 'team' | 'audit'>('general');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  // Current User Info
+  const [currentUserRole, setCurrentUserRole] = useState<string>('VIEWER');
+  const [currentUserId, setCurrentUserId] = useState<string>('');
 
   // General Settings State
   const [welcomeMessage, setWelcomeMessage] = useState('');
@@ -56,6 +63,19 @@ export default function SettingsPage() {
   // Widget Copy State
   const [copiedEmbedCode, setCopiedEmbedCode] = useState(false);
 
+  // Team Management State
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [newMemberName, setNewMemberName] = useState('');
+  const [newMemberRole, setNewMemberRole] = useState<'ADMIN' | 'AGENT' | 'VIEWER'>('AGENT');
+  const [newMemberPassword, setNewMemberPassword] = useState('');
+  const [invitingMember, setInvitingMember] = useState(false);
+  const [updatingRoleUserId, setUpdatingRoleUserId] = useState<string | null>(null);
+
+  // Audit Logs State
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [loadingAudit, setLoadingAudit] = useState(false);
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -72,6 +92,11 @@ export default function SettingsPage() {
       // Load API Keys
       const keys = await apiRequest('/auth/api-keys');
       setApiKeys(keys);
+
+      // Load User Info
+      const meResult = await apiRequest('/auth/me');
+      setCurrentUserRole(meResult.user.role);
+      setCurrentUserId(meResult.user.id);
     } catch (err) {
       const errorVal = err as Error;
       setError(errorVal.message || 'Failed to load settings.');
@@ -80,12 +105,40 @@ export default function SettingsPage() {
     }
   }, []);
 
+  const loadTeam = async () => {
+    try {
+      const members = await apiRequest('/auth/team');
+      setTeamMembers(members);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadAuditLogs = async () => {
+    try {
+      setLoadingAudit(true);
+      const logs = await apiRequest('/observability/audit-logs');
+      setAuditLogs(logs);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingAudit(false);
+    }
+  };
+
   useEffect(() => {
     Promise.resolve().then(() => {
       loadData();
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadData]);
+
+  useEffect(() => {
+    if (activeTab === 'team') {
+      loadTeam();
+    } else if (activeTab === 'audit') {
+      loadAuditLogs();
+    }
+  }, [activeTab]);
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,6 +212,81 @@ export default function SettingsPage() {
     }
   };
 
+  const handleInviteMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMemberEmail.trim()) return;
+
+    setInvitingMember(true);
+    setError('');
+    setSuccessMsg('');
+
+    try {
+      await apiRequest('/auth/team/members', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: newMemberEmail,
+          name: newMemberName || undefined,
+          role: newMemberRole,
+          password: newMemberPassword || undefined,
+        }),
+      });
+      setSuccessMsg('Team member invited successfully!');
+      setNewMemberEmail('');
+      setNewMemberName('');
+      setNewMemberPassword('');
+      setNewMemberRole('AGENT');
+      loadTeam();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      const errorVal = err as Error;
+      setError(errorVal.message || 'Failed to invite team member.');
+    } finally {
+      setInvitingMember(false);
+    }
+  };
+
+  const handleUpdateRole = async (targetUserId: string, role: string) => {
+    setUpdatingRoleUserId(targetUserId);
+    setError('');
+    setSuccessMsg('');
+
+    try {
+      await apiRequest(`/auth/team/members/${targetUserId}/role`, {
+        method: 'PATCH',
+        body: JSON.stringify({ role }),
+      });
+      setSuccessMsg('User role updated!');
+      loadTeam();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      const errorVal = err as Error;
+      setError(errorVal.message || 'Failed to update user role.');
+    } finally {
+      setUpdatingRoleUserId(null);
+    }
+  };
+
+  const handleRemoveMember = async (targetUserId: string, email: string) => {
+    if (!confirm(`Are you sure you want to remove ${email} from the team?`)) {
+      return;
+    }
+
+    setError('');
+    setSuccessMsg('');
+
+    try {
+      await apiRequest(`/auth/team/members/${targetUserId}`, {
+        method: 'DELETE',
+      });
+      setSuccessMsg('User removed from team!');
+      loadTeam();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      const errorVal = err as Error;
+      setError(errorVal.message || 'Failed to remove team member.');
+    }
+  };
+
   const copyToClipboard = (text: string, isEmbed: boolean) => {
     navigator.clipboard.writeText(text);
     if (isEmbed) {
@@ -169,8 +297,6 @@ export default function SettingsPage() {
       setTimeout(() => setCopiedKey(false), 2000);
     }
   };
-
-
 
   const embedCode = `<!-- GroundedDesk Chat Widget -->
 <script
@@ -195,11 +321,11 @@ export default function SettingsPage() {
       {/* Title */}
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
-        <p className="text-sm text-slate-400 mt-1">Configure your chat widget, API keys, and model boundaries</p>
+        <p className="text-sm text-slate-400 mt-1">Configure your chat widget, API keys, team access and security audits</p>
       </div>
 
       {/* Tabs list */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-px">
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-px">
         <button
           onClick={() => setActiveTab('general')}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase border-b-2 transition-all -mb-px ${
@@ -235,6 +361,32 @@ export default function SettingsPage() {
           <Code className="w-4 h-4" />
           <span>Widget Embed</span>
         </button>
+
+        <button
+          onClick={() => setActiveTab('team')}
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase border-b-2 transition-all -mb-px ${
+            activeTab === 'team'
+              ? 'border-indigo-500 text-indigo-400'
+              : 'border-transparent text-slate-500 hover:text-slate-300'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>Team</span>
+        </button>
+
+        {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
+          <button
+            onClick={() => setActiveTab('audit')}
+            className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase border-b-2 transition-all -mb-px ${
+              activeTab === 'audit'
+                ? 'border-indigo-500 text-indigo-400'
+                : 'border-transparent text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            <Shield className="w-4 h-4" />
+            <span>Audit Logs</span>
+          </button>
+        )}
       </div>
 
       {error && (
@@ -271,6 +423,7 @@ export default function SettingsPage() {
                 onChange={(e) => setWelcomeMessage(e.target.value)}
                 className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs resize-none"
                 required
+                disabled={currentUserRole === 'VIEWER'}
               />
             </div>
 
@@ -289,6 +442,7 @@ export default function SettingsPage() {
                     value={confidenceThreshold}
                     onChange={(e) => setConfidenceThreshold(parseFloat(e.target.value))}
                     className="w-full h-1 bg-slate-850 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                    disabled={currentUserRole === 'VIEWER'}
                   />
                 </div>
                 <p className="text-[10px] text-slate-500 mt-1.5 leading-normal">
@@ -307,12 +461,14 @@ export default function SettingsPage() {
                     value={widgetColor}
                     onChange={(e) => setWidgetColor(e.target.value)}
                     className="w-8 h-8 rounded border border-slate-800 bg-transparent cursor-pointer"
+                    disabled={currentUserRole === 'VIEWER'}
                   />
                   <input
                     type="text"
                     value={widgetColor}
                     onChange={(e) => setWidgetColor(e.target.value)}
                     className="w-24 px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs font-mono"
+                    disabled={currentUserRole === 'VIEWER'}
                   />
                 </div>
               </div>
@@ -327,6 +483,7 @@ export default function SettingsPage() {
                 value={widgetPosition}
                 onChange={(e) => setWidgetPosition(e.target.value as 'bottom-right' | 'bottom-left')}
                 className="px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white text-xs"
+                disabled={currentUserRole === 'VIEWER'}
               >
                 <option value="bottom-right">Bottom Right</option>
                 <option value="bottom-left">Bottom Left</option>
@@ -334,75 +491,79 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Saving Settings...</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-3.5 h-3.5" />
-                <span>Save Changes</span>
-              </>
-            )}
-          </button>
+          {currentUserRole !== 'VIEWER' && (
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Saving Settings...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Save Changes</span>
+                </>
+              )}
+            </button>
+          )}
         </form>
       )}
 
       {/* ── TAB 2: API Keys ────────────────── */}
       {activeTab === 'keys' && (
         <div className="space-y-6">
-          {/* Create API Key */}
-          <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
-            <h3 className="font-semibold text-sm text-white mb-4 flex items-center gap-1.5">
-              <Plus className="w-4 h-4 text-indigo-400" />
-              <span>Generate New API Key</span>
-            </h3>
+          {/* Create API Key (restricted from VIEWER) */}
+          {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
+            <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+              <h3 className="font-semibold text-sm text-white mb-4 flex items-center gap-1.5">
+                <Plus className="w-4 h-4 text-indigo-400" />
+                <span>Generate New API Key</span>
+              </h3>
 
-            {generatedKey && (
-              <div className="mb-5 p-4 bg-emerald-500/5 border border-emerald-500/25 rounded-xl space-y-2.5">
-                <span className="block text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
-                  Key Generated - Copy it now!
-                </span>
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  For security reasons, this key will only be shown once. If you lose it, you will have to generate a new one.
-                </p>
-                <div className="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-850">
-                  <span className="font-mono text-xs text-white select-all break-all flex-1">{generatedKey}</span>
-                  <button
-                    onClick={() => copyToClipboard(generatedKey, false)}
-                    className="p-1 rounded bg-slate-900 border border-slate-800 hover:text-white transition-all"
-                  >
-                    {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-                  </button>
+              {generatedKey && (
+                <div className="mb-5 p-4 bg-emerald-500/5 border border-emerald-500/25 rounded-xl space-y-2.5">
+                  <span className="block text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
+                    Key Generated - Copy it now!
+                  </span>
+                  <p className="text-[10px] text-slate-400 leading-normal">
+                    For security reasons, this key will only be shown once. If you lose it, you will have to generate a new one.
+                  </p>
+                  <div className="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-850">
+                    <span className="font-mono text-xs text-white select-all break-all flex-1">{generatedKey}</span>
+                    <button
+                      onClick={() => copyToClipboard(generatedKey, false)}
+                      className="p-1 rounded bg-slate-900 border border-slate-800 hover:text-white transition-all"
+                    >
+                      {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <form onSubmit={handleCreateApiKey} className="flex gap-3">
-              <input
-                type="text"
-                value={newKeyName}
-                onChange={(e) => setNewKeyName(e.target.value)}
-                placeholder="Production Chat Widget Key"
-                className="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
-                required
-              />
-              <button
-                type="submit"
-                disabled={generatingKey || !newKeyName.trim()}
-                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5 shrink-0"
-              >
-                {generatingKey ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-                <span>Generate Key</span>
-              </button>
-            </form>
-          </div>
+              <form onSubmit={handleCreateApiKey} className="flex gap-3">
+                <input
+                  type="text"
+                  value={newKeyName}
+                  onChange={(e) => setNewKeyName(e.target.value)}
+                  placeholder="Production Chat Widget Key"
+                  className="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={generatingKey || !newKeyName.trim()}
+                  className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5 shrink-0"
+                >
+                  {generatingKey ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                  <span>Generate Key</span>
+                </button>
+              </form>
+            </div>
+          )}
 
           {/* Keys List */}
           <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
@@ -410,7 +571,7 @@ export default function SettingsPage() {
 
             {apiKeys.length === 0 ? (
               <div className="py-8 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20">
-                No active API keys found. Generate one above to connect the chat widget.
+                No active API keys found. {currentUserRole !== 'VIEWER' && 'Generate one above to connect the chat widget.'}
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -421,7 +582,9 @@ export default function SettingsPage() {
                       <th className="pb-3 px-4">Key Prefix</th>
                       <th className="pb-3 px-4">Created At</th>
                       <th className="pb-3 px-4">Last Used</th>
-                      <th className="pb-3 pl-4 text-right">Actions</th>
+                      {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
+                        <th className="pb-3 pl-4 text-right">Actions</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -448,15 +611,17 @@ export default function SettingsPage() {
                             <span className="text-slate-600 font-medium">Never</span>
                           )}
                         </td>
-                        <td className="py-3.5 pl-4 text-right">
-                          <button
-                            onClick={() => handleDeleteApiKey(key.id)}
-                            className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all active:scale-95"
-                            title="Revoke Key"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
+                        {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
+                          <td className="py-3.5 pl-4 text-right">
+                            <button
+                              onClick={() => handleDeleteApiKey(key.id)}
+                              className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all active:scale-95"
+                              title="Revoke Key"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -504,6 +669,257 @@ export default function SettingsPage() {
             <pre className="p-4 bg-slate-950 border border-slate-850 rounded-b-xl text-[11px] font-mono text-indigo-300 leading-relaxed overflow-x-auto select-all">
               {embedCode}
             </pre>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 4: Team Management ────────────────── */}
+      {activeTab === 'team' && (
+        <div className="space-y-6">
+          {/* Invite Form (OWNER / ADMIN only) */}
+          {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
+            <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+              <h3 className="font-semibold text-sm text-white mb-4 flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-indigo-400" />
+                <span>Invite Team Member</span>
+              </h3>
+              <form onSubmit={handleInviteMember} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1.5" htmlFor="member-email">
+                    Email Address
+                  </label>
+                  <input
+                    id="member-email"
+                    type="email"
+                    value={newMemberEmail}
+                    onChange={(e) => setNewMemberEmail(e.target.value)}
+                    placeholder="agent@company.com"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1.5" htmlFor="member-name">
+                    Name (Optional)
+                  </label>
+                  <input
+                    id="member-name"
+                    type="text"
+                    value={newMemberName}
+                    onChange={(e) => setNewMemberName(e.target.value)}
+                    placeholder="Sarah Connor"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1.5" htmlFor="member-role">
+                    Role
+                  </label>
+                  <select
+                    id="member-role"
+                    value={newMemberRole}
+                    onChange={(e) => setNewMemberRole(e.target.value as any)}
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white text-xs"
+                  >
+                    <option value="ADMIN">Admin</option>
+                    <option value="AGENT">Agent</option>
+                    <option value="VIEWER">Viewer</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1.5" htmlFor="member-password">
+                    Password (Optional)
+                  </label>
+                  <input
+                    id="member-password"
+                    type="password"
+                    value={newMemberPassword}
+                    onChange={(e) => setNewMemberPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                  />
+                </div>
+                <div className="md:col-span-2 mt-2">
+                  <button
+                    type="submit"
+                    disabled={invitingMember || !newMemberEmail.trim()}
+                    className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
+                  >
+                    {invitingMember ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                    <span>Add Team Member</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Members List */}
+          <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+            <h3 className="font-semibold text-sm text-white mb-4">Team Members</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-800/80 text-slate-400 font-semibold">
+                    <th className="pb-3 pr-4">User</th>
+                    <th className="pb-3 px-4">Role</th>
+                    <th className="pb-3 px-4">Joined At</th>
+                    {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
+                      <th className="pb-3 pl-4 text-right">Actions</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamMembers.map((member) => (
+                    <tr key={member.id} className="border-b border-slate-800/40 last:border-0 hover:bg-slate-850/20 transition-all">
+                      <td className="py-3.5 pr-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center font-bold text-indigo-400 uppercase text-xs">
+                            {member.name ? member.name.substring(0, 2) : member.email.substring(0, 2)}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-white block">{member.name || 'No Name'}</span>
+                            <span className="text-[10px] text-slate-500 block">{member.email}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {updatingRoleUserId === member.id ? (
+                          <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
+                        ) : (
+                          <div className="flex items-center">
+                            {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && member.role !== 'OWNER' && member.id !== currentUserId ? (
+                              <select
+                                value={member.role}
+                                onChange={(e) => handleUpdateRole(member.id, e.target.value)}
+                                className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-indigo-500"
+                              >
+                                <option value="ADMIN">Admin</option>
+                                <option value="AGENT">Agent</option>
+                                <option value="VIEWER">Viewer</option>
+                              </select>
+                            ) : (
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
+                                member.role === 'OWNER'
+                                  ? 'bg-purple-500/10 border border-purple-500/20 text-purple-400'
+                                  : member.role === 'ADMIN'
+                                  ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
+                                  : member.role === 'AGENT'
+                                  ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                                  : 'bg-slate-500/10 border border-slate-500/20 text-slate-400'
+                              }`}>
+                                {member.role}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-400">
+                        {new Date(member.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </td>
+                      {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
+                        <td className="py-3.5 pl-4 text-right">
+                          {member.role !== 'OWNER' && member.id !== currentUserId && (
+                            <button
+                              onClick={() => handleRemoveMember(member.id, member.email)}
+                              className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all active:scale-95"
+                              title="Remove Team Member"
+                            >
+                              <UserMinus className="w-4 h-4" />
+                            </button>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 5: Audit Logs ────────────────── */}
+      {activeTab === 'audit' && (
+        <div className="space-y-6">
+          <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-sm text-white flex items-center gap-1.5">
+                <Shield className="w-4 h-4 text-indigo-400" />
+                <span>Security Audit Trail</span>
+              </h3>
+              <button
+                onClick={loadAuditLogs}
+                disabled={loadingAudit}
+                className="px-3 py-1 bg-slate-880 hover:bg-slate-800 disabled:opacity-50 text-slate-300 hover:text-white rounded-lg text-[10px] font-semibold transition-all flex items-center gap-1"
+              >
+                {loadingAudit && <Loader2 className="w-3 h-3 animate-spin" />}
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            {loadingAudit && auditLogs.length === 0 ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-500">
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
+                <span className="text-xs">Loading audit logs...</span>
+              </div>
+            ) : auditLogs.length === 0 ? (
+              <div className="py-8 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20">
+                No audit logs found. Security events will appear here in real time.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-[11px] border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-800/80 text-slate-400 font-semibold">
+                      <th className="pb-3 pr-4">Timestamp</th>
+                      <th className="pb-3 px-4">User</th>
+                      <th className="pb-3 px-4">Action</th>
+                      <th className="pb-3 px-4">Details</th>
+                      <th className="pb-3 pl-4">IP Address</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {auditLogs.map((log) => (
+                      <tr key={log.id} className="border-b border-slate-800/40 last:border-0 hover:bg-slate-850/20 transition-all">
+                        <td className="py-3 pr-4 text-slate-400 whitespace-nowrap">
+                          {new Date(log.createdAt).toLocaleString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            second: '2-digit',
+                          })}
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-slate-300">
+                          {log.userEmail || (log.user ? log.user.email : 'System')}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2 py-0.5 rounded-[4px] font-mono text-[9px] font-semibold ${
+                            log.action === 'KNOWLEDGE_DELETE' || log.action === 'API_KEY_REVOKE' || log.action === 'MEMBER_REMOVE'
+                              ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                              : log.action === 'KNOWLEDGE_CREATE' || log.action === 'API_KEY_CREATE' || log.action === 'MEMBER_INVITE'
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
+                          }`}>
+                            {log.action}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-300 max-w-xs truncate" title={log.details}>
+                          {log.details || '-'}
+                        </td>
+                        <td className="py-3 pl-4 font-mono text-slate-400">
+                          {log.ipAddress || '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}

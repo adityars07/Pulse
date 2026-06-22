@@ -1,7 +1,9 @@
 import { Controller, Get, Param, Patch, Body, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { TenantAwarePrismaService } from '../prisma/tenant-aware-prisma.service';
-import { ConversationStatus } from '@prisma/client';
+import { ConversationStatus, UserRole } from '@prisma/client';
 
 @Controller('conversations')
 @UseGuards(JwtAuthGuard)
@@ -53,6 +55,8 @@ export class ChatController {
    * Update conversation status (ACTIVE, RESOLVED, ESCALATED).
    */
   @Patch(':id/status')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.OWNER, UserRole.ADMIN, UserRole.AGENT)
   async updateStatus(
     @Param('id') id: string,
     @Body('status') status: ConversationStatus,
