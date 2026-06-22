@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
+import { getToken } from '../../../lib/api';
 import { io, Socket } from 'socket.io-client';
 
 interface ChatMessage {
@@ -18,7 +18,7 @@ interface AgentViewProps {
 }
 
 export default function AgentView({ conversationId, onResolve }: AgentViewProps) {
-  const { data: session } = useSession() as any;
+  const token = getToken();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [status, setStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
@@ -54,11 +54,11 @@ export default function AgentView({ conversationId, onResolve }: AgentViewProps)
   };
 
   useEffect(() => {
-    if (!session?.accessToken) return;
+    if (!token) return;
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     const socket = io(`${apiUrl}/agent`, {
-      auth: { token: session.accessToken },
+      auth: { token },
       transports: ['websocket'],
     });
 
@@ -172,7 +172,7 @@ export default function AgentView({ conversationId, onResolve }: AgentViewProps)
     return () => {
       socket.disconnect();
     };
-  }, [session?.accessToken, conversationId, onResolve]);
+  }, [token, conversationId, onResolve]);
 
   useEffect(() => {
     scrollToBottom();

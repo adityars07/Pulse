@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { apiRequest, getToken } from '../../lib/api';
 import AgentView from '../conversations/[id]/agent-view';
 
 interface EscalatedConversation {
@@ -17,24 +17,18 @@ interface EscalatedConversation {
  * Clicking a conversation opens the live AgentView panel.
  */
 export default function AgentInboxPage() {
-  const { data: session } = useSession() as any;
   const [conversations, setConversations] = useState<EscalatedConversation[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchEscalated = async () => {
-    if (!session?.accessToken) return;
+    const token = getToken();
+    if (!token) return;
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/conversations?status=ESCALATED`,
-        {
-          headers: { Authorization: `Bearer ${session.accessToken}` },
-        },
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setConversations(data.conversations ?? []);
-      }
+      const data = await apiRequest('/conversations');
+      const list = Array.isArray(data) ? data : (data.conversations ?? []);
+      const escalated = list.filter((conv: any) => conv.status === 'ESCALATED');
+      setConversations(escalated);
     } catch {
       // silently fail — not critical
     } finally {
@@ -47,8 +41,7 @@ export default function AgentInboxPage() {
     // Poll every 15 seconds for new escalations
     const interval = setInterval(fetchEscalated, 15_000);
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.accessToken]);
+  }, []);
 
   const handleResolve = () => {
     setSelected(null);
