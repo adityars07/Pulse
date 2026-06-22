@@ -9,6 +9,7 @@ import { ObservabilityModule } from './observability/observability.module';
 import { AgentModule } from './agent/agent.module';
 import { BillingModule } from './billing/billing.module';
 import { StorageModule } from './storage/storage.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 import { TenantMiddleware } from './tenant/tenant.middleware';
 import { HealthController } from './health.controller';
 
@@ -27,6 +28,7 @@ import { HealthController } from './health.controller';
     AgentModule,
     BillingModule,
     StorageModule,
+    IntegrationsModule,
   ],
   controllers: [HealthController],
 })
