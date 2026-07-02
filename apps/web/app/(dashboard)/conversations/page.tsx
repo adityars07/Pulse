@@ -60,7 +60,7 @@ export default function ConversationsPage() {
       case 'ESCALATED':
         return <AlertCircle className="w-4 h-4 text-amber-400" />;
       default:
-        return <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" />;
+        return <Loader2 className="w-4 h-4 text-[#7C3AED] animate-spin" />;
     }
   };
 
@@ -71,7 +71,7 @@ export default function ConversationsPage() {
       case 'ESCALATED':
         return 'bg-amber-500/10 border-amber-500/20 text-amber-400';
       default:
-        return 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400';
+        return 'bg-purple-50 border-purple-100 text-[#7C3AED]';
     }
   };
 
@@ -100,12 +100,12 @@ export default function ConversationsPage() {
     <div className="space-y-8">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Conversations</h1>
+        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Conversations</h1>
         <p className="text-sm text-slate-400 mt-1">Monitor user chats, visitor details, and handoff alerts</p>
       </div>
 
       {/* Filter Options */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
         <div className="flex items-center gap-2 w-full sm:w-auto">
           {['ALL', 'ACTIVE', 'RESOLVED', 'ESCALATED'].map((status) => (
             <button
@@ -113,8 +113,8 @@ export default function ConversationsPage() {
               onClick={() => setStatusFilter(status)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                 statusFilter === status
-                  ? 'bg-indigo-500/15 border-indigo-500/35 text-indigo-300'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-purple-50 border-indigo-500/35 text-[#7C3AED]'
+                  : 'bg-[#f4f2ff] border-slate-200 text-slate-400 hover:text-slate-700'
               }`}
             >
               {status}
@@ -129,25 +129,25 @@ export default function ConversationsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search conversations..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+            className="w-full pl-9 pr-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
           />
         </div>
       </div>
 
       {/* Table List */}
-      <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+      <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
         {loading ? (
           <div className="py-12 flex items-center justify-center text-slate-500 text-xs">
             <Loader2 className="w-6 h-6 animate-spin text-indigo-500 mr-2" />
             <span>Loading chats...</span>
           </div>
         ) : error ? (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-200 text-xs rounded-xl flex items-center gap-2">
+          <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-600 text-xs rounded-xl flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         ) : filteredConversations.length === 0 ? (
-          <div className="py-16 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20 flex flex-col items-center gap-2">
+          <div className="py-16 text-center text-slate-500 text-xs border border-dashed border-slate-200 rounded-xl bg-[#f4f2ff]/20 flex flex-col items-center gap-2">
             <MessageSquare className="w-8 h-8 text-slate-600" />
             <span>No conversations match the selected filter.</span>
           </div>
@@ -155,7 +155,7 @@ export default function ConversationsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-800/80 text-slate-400 font-semibold">
+                <tr className="border-b border-slate-200 text-slate-400 font-semibold">
                   <th className="pb-3 pr-4">Visitor</th>
                   <th className="pb-3 px-4">Status</th>
                   <th className="pb-3 px-4">Rating</th>
@@ -165,14 +165,14 @@ export default function ConversationsPage() {
               </thead>
               <tbody>
                 {filteredConversations.map((c) => (
-                  <tr key={c.id} className="border-b border-slate-800/40 last:border-0 hover:bg-slate-800/10 group transition-all">
+                  <tr key={c.id} className="border-b border-slate-200/40 last:border-0 hover:bg-slate-100/10 group transition-all">
                     <td className="py-4 pr-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-slate-950/80 border border-slate-800/80 flex items-center justify-center text-slate-400 group-hover:text-indigo-400 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-[#f4f2ff]/80 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-[#7C3AED] transition-colors">
                           <User className="w-4 h-4" />
                         </div>
                         <div className="truncate">
-                          <span className="font-semibold text-white block">Visitor #{c.id.substring(0, 6)}</span>
+                          <span className="font-semibold text-slate-800 block">Visitor #{c.id.substring(0, 6)}</span>
                           <span className="text-[10px] text-slate-500 block mt-0.5 truncate max-w-[180px]">
                             {parseBrowser(c.visitorInfo?.userAgent)} · {c.visitorInfo?.ip || 'Local'}
                           </span>
@@ -216,7 +216,7 @@ export default function ConversationsPage() {
                     <td className="py-4 pl-4 text-right">
                       <Link
                         href={`/conversations/${c.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition-all active:scale-95 text-[11px]"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-semibold transition-all active:scale-95 text-[11px]"
                       >
                         <span>View Chat</span>
                         <ArrowRight className="w-3.5 h-3.5" />

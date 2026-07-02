@@ -73,7 +73,7 @@ export default function DashboardHome() {
 
   if (error) {
     return (
-      <div className="p-6 bg-red-500/10 border border-red-500/20 text-red-200 rounded-2xl flex items-start gap-3">
+      <div className="p-6 bg-red-500/10 border border-red-500/20 text-red-600 rounded-2xl flex items-start gap-3">
         <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
         <div>
           <h3 className="font-semibold text-sm">Error Loading Stats</h3>
@@ -88,34 +88,34 @@ export default function DashboardHome() {
       name: 'Conversations',
       value: stats?.totalConversations ?? 0,
       icon: MessageSquare,
-      color: 'from-blue-500/10 to-indigo-500/10 border-blue-500/20 text-blue-400',
+      iconColor: 'text-blue-500',
     },
     {
       name: 'Total Messages',
       value: stats?.totalMessages ?? 0,
       icon: Layers,
-      color: 'from-emerald-500/10 to-teal-500/10 border-emerald-500/20 text-emerald-400',
+      iconColor: 'text-emerald-500',
     },
     {
       name: 'Model Spend',
       value: `$${(stats?.totalSpend ?? 0).toFixed(4)}`,
       icon: DollarSign,
-      color: 'from-purple-500/10 to-pink-500/10 border-purple-500/20 text-purple-400',
+      iconColor: 'text-[#7C3AED]',
     },
     {
       name: 'Avg Response Latency',
       value: stats?.avgLatencyMs ? `${(stats.avgLatencyMs / 1000).toFixed(2)}s` : '0.0s',
       icon: Clock,
-      color: 'from-amber-500/10 to-orange-500/10 border-amber-500/20 text-amber-400',
+      iconColor: 'text-amber-500',
     },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 text-left">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Overview</h1>
-        <p className="text-sm text-slate-400 mt-1">Real-time statistics and usage spend history</p>
+        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Overview</h1>
+        <p className="text-sm text-slate-500 mt-1">Real-time statistics and usage spend history</p>
       </div>
 
       {/* Grid Cards */}
@@ -125,14 +125,14 @@ export default function DashboardHome() {
           return (
             <div
               key={card.name}
-              className={`p-6 rounded-2xl bg-gradient-to-tr border ${card.color} flex items-center justify-between shadow-lg`}
+              className="p-6 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between shadow-sm"
             >
               <div>
-                <span className="text-xs text-slate-400 font-medium">{card.name}</span>
-                <span className="block text-2xl font-bold text-white mt-1.5">{card.value}</span>
+                <span className="text-xs text-slate-500 font-medium">{card.name}</span>
+                <span className="block text-2xl font-bold text-slate-800 mt-1.5">{card.value}</span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-slate-900/60 flex items-center justify-center border border-slate-800/60">
-                <Icon className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
+                <Icon className={`w-5 h-5 ${card.iconColor}`} />
               </div>
             </div>
           );
@@ -141,13 +141,13 @@ export default function DashboardHome() {
 
       {/* Chart Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 p-6 rounded-2xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm">
+        <div className="lg:col-span-2 p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-semibold text-sm text-white">Spend History</h3>
-              <p className="text-[11px] text-slate-500 mt-0.5">Token spend over the last 7 days</p>
+              <h3 className="font-semibold text-sm text-slate-800">Spend History</h3>
+              <p className="text-[11px] text-slate-400 mt-0.5">Token spend over the last 7 days</p>
             </div>
-            <div className="flex items-center gap-1 text-xs text-indigo-400 font-semibold uppercase tracking-wider bg-indigo-500/5 px-2 py-1 rounded-md border border-indigo-500/10">
+            <div className="flex items-center gap-1 text-xs text-[#7C3AED] font-bold uppercase tracking-wider bg-purple-50 px-2 py-1 rounded-md border border-purple-100">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>Cost Trend</span>
             </div>
@@ -159,14 +159,14 @@ export default function DashboardHome() {
                 <AreaChart data={history} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorSpend" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    stroke="#64748b"
+                    stroke="#94a3b8"
                     fontSize={10}
                     tickLine={false}
                     axisLine={false}
@@ -176,7 +176,7 @@ export default function DashboardHome() {
                     }}
                   />
                   <YAxis
-                    stroke="#64748b"
+                    stroke="#94a3b8"
                     fontSize={10}
                     tickLine={false}
                     axisLine={false}
@@ -184,18 +184,18 @@ export default function DashboardHome() {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderColor: '#1e293b',
+                      backgroundColor: '#ffffff',
+                      borderColor: '#e2e8f0',
                       borderRadius: '12px',
                     }}
-                    labelStyle={{ color: '#94a3b8', fontSize: '11px', fontWeight: 600 }}
-                    itemStyle={{ color: '#fff', fontSize: '12px' }}
+                    labelStyle={{ color: '#64748b', fontSize: '11px', fontWeight: 600 }}
+                    itemStyle={{ color: '#1e293b', fontSize: '12px' }}
                     formatter={(value: any) => [`$${parseFloat(value).toFixed(5)}`, 'Spend']}
                   />
                   <Area
                     type="monotone"
                     dataKey="spend"
-                    stroke="#6366f1"
+                    stroke="#7C3AED"
                     strokeWidth={2}
                     fillOpacity={1}
                     fill="url(#colorSpend)"
@@ -203,7 +203,7 @@ export default function DashboardHome() {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20">
+              <div className="h-full flex items-center justify-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
                 No billing history recorded yet
               </div>
             )}
@@ -211,20 +211,20 @@ export default function DashboardHome() {
         </div>
 
         {/* Quick Actions Guide */}
-        <div className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm flex flex-col justify-between">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 className="font-semibold text-sm text-white mb-4">Quick Setup Guide</h3>
+            <h3 className="font-semibold text-sm text-slate-800 mb-4">Quick Setup Guide</h3>
             <div className="space-y-4">
               <div className="flex gap-3">
-                <div className="w-7 h-7 shrink-0 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold">
+                <div className="w-7 h-7 shrink-0 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold">
                   1
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-slate-200">Load Knowledge Base</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Upload PDFs, docs, or crawl urls to ingest knowledge</p>
+                  <h4 className="text-xs font-semibold text-slate-700">Load Knowledge Base</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Upload PDFs, docs, or crawl urls to ingest knowledge</p>
                   <Link
                     href="/sources"
-                    className="inline-flex items-center gap-1 text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold mt-1.5"
+                    className="inline-flex items-center gap-1 text-[11px] text-[#7C3AED] hover:text-[#6D28D9] font-bold mt-1.5"
                   >
                     <span>Upload sources</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -233,15 +233,15 @@ export default function DashboardHome() {
               </div>
 
               <div className="flex gap-3">
-                <div className="w-7 h-7 shrink-0 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xs font-bold">
+                <div className="w-7 h-7 shrink-0 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-xs font-bold">
                   2
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-slate-200">Embed Chat Widget</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Add the standalone script to your web page body</p>
+                  <h4 className="text-xs font-semibold text-slate-700">Embed Chat Widget</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Add the standalone script to your web page body</p>
                   <Link
                     href="/settings"
-                    className="inline-flex items-center gap-1 text-[11px] text-purple-400 hover:text-purple-300 font-semibold mt-1.5"
+                    className="inline-flex items-center gap-1 text-[11px] text-purple-600 hover:text-purple-800 font-bold mt-1.5"
                   >
                     <span>Get embed script</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -251,10 +251,10 @@ export default function DashboardHome() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-800/60 mt-4 flex items-center justify-between text-xs text-slate-500">
+          <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs text-slate-400">
             <span>Widget status</span>
-            <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="flex items-center gap-1.5 text-emerald-500 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
               Online
             </span>
           </div>

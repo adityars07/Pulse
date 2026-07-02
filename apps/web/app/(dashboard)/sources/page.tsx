@@ -169,7 +169,7 @@ export default function SourcesPage() {
       case 'READY':
         return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
       case 'PROCESSING':
-        return <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" />;
+        return <Loader2 className="w-4 h-4 text-[#7C3AED] animate-spin" />;
       case 'FAILED':
         return <AlertCircle className="w-4 h-4 text-red-400" />;
       default:
@@ -182,7 +182,7 @@ export default function SourcesPage() {
       case 'READY':
         return 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400';
       case 'PROCESSING':
-        return 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400';
+        return 'bg-purple-50 border-purple-100 text-[#7C3AED]';
       case 'FAILED':
         return 'bg-red-500/10 border-red-500/20 text-red-400';
       default:
@@ -194,12 +194,12 @@ export default function SourcesPage() {
     <div className="space-y-8">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Knowledge Base</h1>
+        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Knowledge Base</h1>
         <p className="text-sm text-slate-400 mt-1">Upload files or crawl URLs to inject knowledge into the model</p>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-200 text-xs rounded-xl flex items-center gap-2">
+        <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-600 text-xs rounded-xl flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -208,23 +208,23 @@ export default function SourcesPage() {
       {/* Grid Inputs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upload File Card */}
-        <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+        <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
           <div className="flex items-center gap-2.5 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <div className="w-8 h-8 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-[#7C3AED]">
               <Upload className="w-4 h-4" />
             </div>
-            <h2 className="font-semibold text-sm text-white">Upload File Source</h2>
+            <h2 className="font-semibold text-sm text-slate-800">Upload File Source</h2>
           </div>
 
           {uploadError && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-200 text-xs rounded-xl flex items-center gap-2">
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 text-xs rounded-xl flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{uploadError}</span>
             </div>
           )}
 
           <form onSubmit={handleFileUpload} className="space-y-4">
-            <div className="border-2 border-dashed border-slate-800 rounded-xl p-5 hover:border-slate-700/80 transition-colors flex flex-col items-center justify-center text-center cursor-pointer relative">
+            <div className="border-2 border-dashed border-slate-200 rounded-xl p-5 hover:border-slate-200/80 transition-colors flex flex-col items-center justify-center text-center cursor-pointer relative">
               <input
                 id="file-input"
                 type="file"
@@ -233,7 +233,7 @@ export default function SourcesPage() {
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
               <FileText className="w-8 h-8 text-slate-500 mb-2" />
-              <span className="text-xs font-semibold text-slate-300">
+              <span className="text-xs font-semibold text-slate-600">
                 {file ? file.name : 'Click to select PDF, DOCX, or Markdown'}
               </span>
               <span className="text-[10px] text-slate-500 mt-1">Max file size 10MB</span>
@@ -249,7 +249,7 @@ export default function SourcesPage() {
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}
                 placeholder="Product Manual v2"
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                className="w-full px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
                 required
               />
             </div>
@@ -257,7 +257,7 @@ export default function SourcesPage() {
             <button
               type="submit"
               disabled={uploading || !file}
-              className="w-full py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
+              className="w-full py-2 bg-[#7C3AED] hover:bg-[#6D28D9] active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-purple-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
             >
               {uploading ? (
                 <>
@@ -275,16 +275,16 @@ export default function SourcesPage() {
         </div>
 
         {/* Crawl URL Card */}
-        <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+        <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
           <div className="flex items-center gap-2.5 mb-5">
             <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
               <Globe className="w-4 h-4" />
             </div>
-            <h2 className="font-semibold text-sm text-white">Crawl Sitemap URL</h2>
+            <h2 className="font-semibold text-sm text-slate-800">Crawl Sitemap URL</h2>
           </div>
 
           {crawlError && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-200 text-xs rounded-xl flex items-center gap-2">
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 text-xs rounded-xl flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{crawlError}</span>
             </div>
@@ -301,7 +301,7 @@ export default function SourcesPage() {
                 value={crawlUrl}
                 onChange={(e) => setCrawlUrl(e.target.value)}
                 placeholder="https://company.com/sitemap.xml"
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-purple-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                className="w-full px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-purple-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
                 required
               />
             </div>
@@ -316,7 +316,7 @@ export default function SourcesPage() {
                 value={crawlName}
                 onChange={(e) => setCrawlName(e.target.value)}
                 placeholder="Help Center Docs"
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-purple-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                className="w-full px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-purple-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
                 required
               />
             </div>
@@ -324,7 +324,7 @@ export default function SourcesPage() {
             <button
               type="submit"
               disabled={crawling || !crawlUrl || !crawlName}
-              className="w-full py-2 bg-purple-600 hover:bg-purple-700 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-purple-600/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
+              className="w-full py-2 bg-purple-600 hover:bg-purple-700 active:scale-98 text-slate-800 rounded-xl text-xs font-semibold shadow-lg shadow-purple-600/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
             >
               {crawling ? (
                 <>
@@ -343,10 +343,10 @@ export default function SourcesPage() {
       </div>
 
       {/* Sources List Section */}
-      <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+      <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h3 className="font-semibold text-sm text-white">Ingested Sources</h3>
+            <h3 className="font-semibold text-sm text-slate-800">Ingested Sources</h3>
             <p className="text-[11px] text-slate-500 mt-0.5">Documents and sites currently loaded in knowledge base</p>
           </div>
           <div className="relative max-w-xs w-full">
@@ -356,7 +356,7 @@ export default function SourcesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search sources..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+              className="w-full pl-9 pr-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
             />
           </div>
         </div>
@@ -367,7 +367,7 @@ export default function SourcesPage() {
             <span>Loading sources...</span>
           </div>
         ) : filteredSources.length === 0 ? (
-          <div className="py-16 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20 flex flex-col items-center gap-2">
+          <div className="py-16 text-center text-slate-500 text-xs border border-dashed border-slate-200 rounded-xl bg-[#f4f2ff]/20 flex flex-col items-center gap-2">
             <Database className="w-8 h-8 text-slate-600" />
             <span>No knowledge sources found. Ingest files or URLs above to start.</span>
           </div>
@@ -375,7 +375,7 @@ export default function SourcesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-800/80 text-slate-400 font-semibold">
+                <tr className="border-b border-slate-200 text-slate-400 font-semibold">
                   <th className="pb-3 pr-4">Name</th>
                   <th className="pb-3 px-4">Type</th>
                   <th className="pb-3 px-4">Status</th>
@@ -386,9 +386,9 @@ export default function SourcesPage() {
               </thead>
               <tbody>
                 {filteredSources.map((source) => (
-                  <tr key={source.id} className="border-b border-slate-800/40 last:border-0 hover:bg-slate-800/10 group transition-all">
-                    <td className="py-3.5 pr-4 font-semibold text-white truncate max-w-[200px]">
-                      <Link href={`/sources/${source.id}`} className="hover:text-indigo-400 hover:underline transition-colors">
+                  <tr key={source.id} className="border-b border-slate-200/40 last:border-0 hover:bg-slate-100/10 group transition-all">
+                    <td className="py-3.5 pr-4 font-semibold text-slate-800 truncate max-w-[200px]">
+                      <Link href={`/sources/${source.id}`} className="hover:text-[#7C3AED] hover:underline transition-colors">
                         {source.name}
                       </Link>
                       {source.status === 'FAILED' && source.errorMessage && (
@@ -398,7 +398,7 @@ export default function SourcesPage() {
                       )}
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="px-2 py-0.5 rounded-md bg-slate-950/60 border border-slate-800/80 text-slate-300 text-[10px] font-semibold uppercase tracking-wider">
+                      <span className="px-2 py-0.5 rounded-md bg-[#f4f2ff]/60 border border-slate-200 text-slate-600 text-[10px] font-semibold uppercase tracking-wider">
                         {source.type}
                       </span>
                     </td>
@@ -408,7 +408,7 @@ export default function SourcesPage() {
                         <span>{source.status}</span>
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-semibold text-slate-300">
+                    <td className="py-3.5 px-4 font-semibold text-slate-600">
                       {source.status === 'READY' ? source.chunkCount : '-'}
                     </td>
                     <td className="py-3.5 px-4 text-slate-400">
@@ -421,7 +421,7 @@ export default function SourcesPage() {
                     <td className="py-3.5 pl-4 text-right">
                       <button
                         onClick={() => handleDelete(source.id)}
-                        className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all active:scale-95"
+                        className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-500 hover:text-red-600 transition-all active:scale-95"
                         title="Delete Source"
                       >
                         <Trash2 className="w-4 h-4" />

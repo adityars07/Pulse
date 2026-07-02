@@ -320,18 +320,18 @@ export default function SettingsPage() {
     <div className="space-y-8 max-w-4xl">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
+        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Settings</h1>
         <p className="text-sm text-slate-400 mt-1">Configure your chat widget, API keys, team access and security audits</p>
       </div>
 
       {/* Tabs list */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-px">
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-px">
         <button
           onClick={() => setActiveTab('general')}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase border-b-2 transition-all -mb-px ${
             activeTab === 'general'
-              ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300'
+              ? 'border-indigo-500 text-[#7C3AED]'
+              : 'border-transparent text-slate-500 hover:text-slate-600'
           }`}
         >
           <Sliders className="w-4 h-4" />
@@ -342,8 +342,8 @@ export default function SettingsPage() {
           onClick={() => setActiveTab('keys')}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase border-b-2 transition-all -mb-px ${
             activeTab === 'keys'
-              ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300'
+              ? 'border-indigo-500 text-[#7C3AED]'
+              : 'border-transparent text-slate-500 hover:text-slate-600'
           }`}
         >
           <Key className="w-4 h-4" />
@@ -354,8 +354,8 @@ export default function SettingsPage() {
           onClick={() => setActiveTab('widget')}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase border-b-2 transition-all -mb-px ${
             activeTab === 'widget'
-              ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300'
+              ? 'border-indigo-500 text-[#7C3AED]'
+              : 'border-transparent text-slate-500 hover:text-slate-600'
           }`}
         >
           <Code className="w-4 h-4" />
@@ -366,8 +366,8 @@ export default function SettingsPage() {
           onClick={() => setActiveTab('team')}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase border-b-2 transition-all -mb-px ${
             activeTab === 'team'
-              ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300'
+              ? 'border-indigo-500 text-[#7C3AED]'
+              : 'border-transparent text-slate-500 hover:text-slate-600'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -379,8 +379,8 @@ export default function SettingsPage() {
             onClick={() => setActiveTab('audit')}
             className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold tracking-wider uppercase border-b-2 transition-all -mb-px ${
               activeTab === 'audit'
-                ? 'border-indigo-500 text-indigo-400'
-                : 'border-transparent text-slate-500 hover:text-slate-300'
+                ? 'border-indigo-500 text-[#7C3AED]'
+                : 'border-transparent text-slate-500 hover:text-slate-600'
             }`}
           >
             <Shield className="w-4 h-4" />
@@ -390,7 +390,7 @@ export default function SettingsPage() {
       </div>
 
       {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-200 text-xs rounded-xl flex items-center gap-2">
+        <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-600 text-xs rounded-xl flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -406,9 +406,9 @@ export default function SettingsPage() {
       {/* ── TAB 1: General Settings ────────────────── */}
       {activeTab === 'general' && (
         <form onSubmit={handleSaveSettings} className="space-y-6">
-          <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm space-y-5">
-            <h3 className="font-semibold text-sm text-white mb-2 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-indigo-400" />
+          <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm space-y-5">
+            <h3 className="font-semibold text-sm text-slate-800 mb-2 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[#7C3AED]" />
               <span>Chat Customization</span>
             </h3>
 
@@ -421,7 +421,7 @@ export default function SettingsPage() {
                 rows={2}
                 value={welcomeMessage}
                 onChange={(e) => setWelcomeMessage(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs resize-none"
+                className="w-full px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 placeholder-slate-500 transition-all text-xs resize-none"
                 required
                 disabled={currentUserRole === 'VIEWER'}
               />
@@ -441,7 +441,7 @@ export default function SettingsPage() {
                     step="0.05"
                     value={confidenceThreshold}
                     onChange={(e) => setConfidenceThreshold(parseFloat(e.target.value))}
-                    className="w-full h-1 bg-slate-850 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                    className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-500"
                     disabled={currentUserRole === 'VIEWER'}
                   />
                 </div>
@@ -460,14 +460,14 @@ export default function SettingsPage() {
                     type="color"
                     value={widgetColor}
                     onChange={(e) => setWidgetColor(e.target.value)}
-                    className="w-8 h-8 rounded border border-slate-800 bg-transparent cursor-pointer"
+                    className="w-8 h-8 rounded border border-slate-200 bg-transparent cursor-pointer"
                     disabled={currentUserRole === 'VIEWER'}
                   />
                   <input
                     type="text"
                     value={widgetColor}
                     onChange={(e) => setWidgetColor(e.target.value)}
-                    className="w-24 px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs font-mono"
+                    className="w-24 px-2.5 py-1.5 bg-[#f4f2ff] border border-slate-200 rounded-lg text-slate-800 text-xs font-mono"
                     disabled={currentUserRole === 'VIEWER'}
                   />
                 </div>
@@ -482,7 +482,7 @@ export default function SettingsPage() {
                 id="position"
                 value={widgetPosition}
                 onChange={(e) => setWidgetPosition(e.target.value as 'bottom-right' | 'bottom-left')}
-                className="px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white text-xs"
+                className="px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 text-xs"
                 disabled={currentUserRole === 'VIEWER'}
               >
                 <option value="bottom-right">Bottom Right</option>
@@ -495,7 +495,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
+              className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-purple-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
             >
               {saving ? (
                 <>
@@ -518,9 +518,9 @@ export default function SettingsPage() {
         <div className="space-y-6">
           {/* Create API Key (restricted from VIEWER) */}
           {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
-            <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
-              <h3 className="font-semibold text-sm text-white mb-4 flex items-center gap-1.5">
-                <Plus className="w-4 h-4 text-indigo-400" />
+            <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
+              <h3 className="font-semibold text-sm text-slate-800 mb-4 flex items-center gap-1.5">
+                <Plus className="w-4 h-4 text-[#7C3AED]" />
                 <span>Generate New API Key</span>
               </h3>
 
@@ -532,11 +532,11 @@ export default function SettingsPage() {
                   <p className="text-[10px] text-slate-400 leading-normal">
                     For security reasons, this key will only be shown once. If you lose it, you will have to generate a new one.
                   </p>
-                  <div className="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-850">
-                    <span className="font-mono text-xs text-white select-all break-all flex-1">{generatedKey}</span>
+                  <div className="flex items-center gap-2 bg-[#f4f2ff] p-2.5 rounded-lg border border-slate-200">
+                    <span className="font-mono text-xs text-slate-800 select-all break-all flex-1">{generatedKey}</span>
                     <button
                       onClick={() => copyToClipboard(generatedKey, false)}
-                      className="p-1 rounded bg-slate-900 border border-slate-800 hover:text-white transition-all"
+                      className="p-1 rounded bg-white border border-slate-200 hover:text-slate-800 transition-all"
                     >
                       {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                     </button>
@@ -550,13 +550,13 @@ export default function SettingsPage() {
                   value={newKeyName}
                   onChange={(e) => setNewKeyName(e.target.value)}
                   placeholder="Production Chat Widget Key"
-                  className="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                  className="flex-1 px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
                   required
                 />
                 <button
                   type="submit"
                   disabled={generatingKey || !newKeyName.trim()}
-                  className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5 shrink-0"
+                  className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-purple-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5 shrink-0"
                 >
                   {generatingKey ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                   <span>Generate Key</span>
@@ -566,18 +566,18 @@ export default function SettingsPage() {
           )}
 
           {/* Keys List */}
-          <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
-            <h3 className="font-semibold text-sm text-white mb-4">Active API Keys</h3>
+          <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
+            <h3 className="font-semibold text-sm text-slate-800 mb-4">Active API Keys</h3>
 
             {apiKeys.length === 0 ? (
-              <div className="py-8 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20">
+              <div className="py-8 text-center text-slate-500 text-xs border border-dashed border-slate-200 rounded-xl bg-[#f4f2ff]/20">
                 No active API keys found. {currentUserRole !== 'VIEWER' && 'Generate one above to connect the chat widget.'}
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-800/80 text-slate-400 font-semibold">
+                    <tr className="border-b border-slate-200 text-slate-400 font-semibold">
                       <th className="pb-3 pr-4">Name</th>
                       <th className="pb-3 px-4">Key Prefix</th>
                       <th className="pb-3 px-4">Created At</th>
@@ -589,8 +589,8 @@ export default function SettingsPage() {
                   </thead>
                   <tbody>
                     {apiKeys.map((key) => (
-                      <tr key={key.id} className="border-b border-slate-800/40 last:border-0 hover:bg-slate-850/20 transition-all">
-                        <td className="py-3.5 pr-4 font-semibold text-white truncate max-w-[150px]">{key.name}</td>
+                      <tr key={key.id} className="border-b border-slate-200/40 last:border-0 hover:bg-slate-50 transition-all">
+                        <td className="py-3.5 pr-4 font-semibold text-slate-800 truncate max-w-[150px]">{key.name}</td>
                         <td className="py-3.5 px-4 font-mono text-slate-400">{key.keyPrefix}...</td>
                         <td className="py-3.5 px-4 text-slate-400">
                           {new Date(key.createdAt).toLocaleDateString(undefined, {
@@ -615,7 +615,7 @@ export default function SettingsPage() {
                           <td className="py-3.5 pl-4 text-right">
                             <button
                               onClick={() => handleDeleteApiKey(key.id)}
-                              className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all active:scale-95"
+                              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-500 hover:text-red-600 transition-all active:scale-95"
                               title="Revoke Key"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -634,9 +634,9 @@ export default function SettingsPage() {
 
       {/* ── TAB 3: Widget Embed ────────────────── */}
       {activeTab === 'widget' && (
-        <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm space-y-5">
-          <h3 className="font-semibold text-sm text-white mb-2 flex items-center gap-1.5">
-            <Code className="w-4 h-4 text-indigo-400" />
+        <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm space-y-5">
+          <h3 className="font-semibold text-sm text-slate-800 mb-2 flex items-center gap-1.5">
+            <Code className="w-4 h-4 text-[#7C3AED]" />
             <span>Copy HTML Snippet</span>
           </h3>
 
@@ -646,11 +646,11 @@ export default function SettingsPage() {
           </p>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between bg-slate-950 px-4 py-2 border border-slate-850 rounded-t-xl border-b-0">
+            <div className="flex items-center justify-between bg-[#f4f2ff] px-4 py-2 border border-slate-200 rounded-t-xl border-b-0">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Embed Code</span>
               <button
                 onClick={() => copyToClipboard(embedCode, true)}
-                className="flex items-center gap-1.5 px-2 py-1 rounded border border-slate-850 bg-slate-900 text-[10px] font-semibold text-slate-400 hover:text-white transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1 rounded border border-slate-200 bg-white text-[10px] font-semibold text-slate-400 hover:text-slate-800 transition-colors"
               >
                 {copiedEmbedCode ? (
                   <>
@@ -666,7 +666,7 @@ export default function SettingsPage() {
               </button>
             </div>
             
-            <pre className="p-4 bg-slate-950 border border-slate-850 rounded-b-xl text-[11px] font-mono text-indigo-300 leading-relaxed overflow-x-auto select-all">
+            <pre className="p-4 bg-[#f4f2ff] border border-slate-200 rounded-b-xl text-[11px] font-mono text-[#7C3AED] leading-relaxed overflow-x-auto select-all">
               {embedCode}
             </pre>
           </div>
@@ -678,9 +678,9 @@ export default function SettingsPage() {
         <div className="space-y-6">
           {/* Invite Form (OWNER / ADMIN only) */}
           {(currentUserRole === 'OWNER' || currentUserRole === 'ADMIN') && (
-            <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
-              <h3 className="font-semibold text-sm text-white mb-4 flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-indigo-400" />
+            <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
+              <h3 className="font-semibold text-sm text-slate-800 mb-4 flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-[#7C3AED]" />
                 <span>Invite Team Member</span>
               </h3>
               <form onSubmit={handleInviteMember} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -694,7 +694,7 @@ export default function SettingsPage() {
                     value={newMemberEmail}
                     onChange={(e) => setNewMemberEmail(e.target.value)}
                     placeholder="agent@company.com"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                    className="w-full px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
                     required
                   />
                 </div>
@@ -708,7 +708,7 @@ export default function SettingsPage() {
                     value={newMemberName}
                     onChange={(e) => setNewMemberName(e.target.value)}
                     placeholder="Sarah Connor"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                    className="w-full px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
                   />
                 </div>
                 <div>
@@ -719,7 +719,7 @@ export default function SettingsPage() {
                     id="member-role"
                     value={newMemberRole}
                     onChange={(e) => setNewMemberRole(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white text-xs"
+                    className="w-full px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 text-xs"
                   >
                     <option value="ADMIN">Admin</option>
                     <option value="AGENT">Agent</option>
@@ -736,14 +736,14 @@ export default function SettingsPage() {
                     value={newMemberPassword}
                     onChange={(e) => setNewMemberPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 text-white placeholder-slate-500 transition-all text-xs"
+                    className="w-full px-3 py-2 bg-[#f4f2ff] border border-slate-200 focus:border-[#7C3AED]/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/10 text-slate-800 placeholder-slate-500 transition-all text-xs"
                   />
                 </div>
                 <div className="md:col-span-2 mt-2">
                   <button
                     type="submit"
                     disabled={invitingMember || !newMemberEmail.trim()}
-                    className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
+                    className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] active:scale-98 text-white rounded-xl text-xs font-semibold shadow-lg shadow-purple-500/10 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-1.5"
                   >
                     {invitingMember ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                     <span>Add Team Member</span>
@@ -754,12 +754,12 @@ export default function SettingsPage() {
           )}
 
           {/* Members List */}
-          <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
-            <h3 className="font-semibold text-sm text-white mb-4">Team Members</h3>
+          <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
+            <h3 className="font-semibold text-sm text-slate-800 mb-4">Team Members</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-800/80 text-slate-400 font-semibold">
+                  <tr className="border-b border-slate-200 text-slate-400 font-semibold">
                     <th className="pb-3 pr-4">User</th>
                     <th className="pb-3 px-4">Role</th>
                     <th className="pb-3 px-4">Joined At</th>
@@ -770,14 +770,14 @@ export default function SettingsPage() {
                 </thead>
                 <tbody>
                   {teamMembers.map((member) => (
-                    <tr key={member.id} className="border-b border-slate-800/40 last:border-0 hover:bg-slate-850/20 transition-all">
+                    <tr key={member.id} className="border-b border-slate-200/40 last:border-0 hover:bg-slate-50 transition-all">
                       <td className="py-3.5 pr-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center font-bold text-indigo-400 uppercase text-xs">
+                          <div className="w-8 h-8 rounded-full bg-purple-50 border border-indigo-500/25 flex items-center justify-center font-bold text-[#7C3AED] uppercase text-xs">
                             {member.name ? member.name.substring(0, 2) : member.email.substring(0, 2)}
                           </div>
                           <div>
-                            <span className="font-semibold text-white block">{member.name || 'No Name'}</span>
+                            <span className="font-semibold text-slate-800 block">{member.name || 'No Name'}</span>
                             <span className="text-[10px] text-slate-500 block">{member.email}</span>
                           </div>
                         </div>
@@ -791,7 +791,7 @@ export default function SettingsPage() {
                               <select
                                 value={member.role}
                                 onChange={(e) => handleUpdateRole(member.id, e.target.value)}
-                                className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-indigo-500"
+                                className="bg-[#f4f2ff] border border-slate-200 rounded px-2 py-1 text-slate-700 text-xs focus:outline-none focus:border-[#7C3AED]"
                               >
                                 <option value="ADMIN">Admin</option>
                                 <option value="AGENT">Agent</option>
@@ -825,7 +825,7 @@ export default function SettingsPage() {
                           {member.role !== 'OWNER' && member.id !== currentUserId && (
                             <button
                               onClick={() => handleRemoveMember(member.id, member.email)}
-                              className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all active:scale-95"
+                              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-500 hover:text-red-600 transition-all active:scale-95"
                               title="Remove Team Member"
                             >
                               <UserMinus className="w-4 h-4" />
@@ -845,16 +845,16 @@ export default function SettingsPage() {
       {/* ── TAB 5: Audit Logs ────────────────── */}
       {activeTab === 'audit' && (
         <div className="space-y-6">
-          <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+          <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-sm text-white flex items-center gap-1.5">
-                <Shield className="w-4 h-4 text-indigo-400" />
+              <h3 className="font-semibold text-sm text-slate-800 flex items-center gap-1.5">
+                <Shield className="w-4 h-4 text-[#7C3AED]" />
                 <span>Security Audit Trail</span>
               </h3>
               <button
                 onClick={loadAuditLogs}
                 disabled={loadingAudit}
-                className="px-3 py-1 bg-slate-880 hover:bg-slate-800 disabled:opacity-50 text-slate-300 hover:text-white rounded-lg text-[10px] font-semibold transition-all flex items-center gap-1"
+                className="px-3 py-1 bg-slate-100 hover:bg-slate-100 disabled:opacity-50 text-slate-600 hover:text-slate-800 rounded-lg text-[10px] font-semibold transition-all flex items-center gap-1"
               >
                 {loadingAudit && <Loader2 className="w-3 h-3 animate-spin" />}
                 <span>Refresh</span>
@@ -867,14 +867,14 @@ export default function SettingsPage() {
                 <span className="text-xs">Loading audit logs...</span>
               </div>
             ) : auditLogs.length === 0 ? (
-              <div className="py-8 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20">
+              <div className="py-8 text-center text-slate-500 text-xs border border-dashed border-slate-200 rounded-xl bg-[#f4f2ff]/20">
                 No audit logs found. Security events will appear here in real time.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11px] border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-800/80 text-slate-400 font-semibold">
+                    <tr className="border-b border-slate-200 text-slate-400 font-semibold">
                       <th className="pb-3 pr-4">Timestamp</th>
                       <th className="pb-3 px-4">User</th>
                       <th className="pb-3 px-4">Action</th>
@@ -884,7 +884,7 @@ export default function SettingsPage() {
                   </thead>
                   <tbody>
                     {auditLogs.map((log) => (
-                      <tr key={log.id} className="border-b border-slate-800/40 last:border-0 hover:bg-slate-850/20 transition-all">
+                      <tr key={log.id} className="border-b border-slate-200/40 last:border-0 hover:bg-slate-50 transition-all">
                         <td className="py-3 pr-4 text-slate-400 whitespace-nowrap">
                           {new Date(log.createdAt).toLocaleString(undefined, {
                             month: 'short',
@@ -894,7 +894,7 @@ export default function SettingsPage() {
                             second: '2-digit',
                           })}
                         </td>
-                        <td className="py-3 px-4 font-semibold text-slate-300">
+                        <td className="py-3 px-4 font-semibold text-slate-600">
                           {log.userEmail || (log.user ? log.user.email : 'System')}
                         </td>
                         <td className="py-3 px-4">
@@ -903,12 +903,12 @@ export default function SettingsPage() {
                               ? 'bg-red-500/10 text-red-400 border border-red-500/20'
                               : log.action === 'KNOWLEDGE_CREATE' || log.action === 'API_KEY_CREATE' || log.action === 'MEMBER_INVITE'
                               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                              : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
+                              : 'bg-purple-50 text-[#7C3AED] border border-purple-100'
                           }`}>
                             {log.action}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-300 max-w-xs truncate" title={log.details}>
+                        <td className="py-3 px-4 text-slate-600 max-w-xs truncate" title={log.details}>
                           {log.details || '-'}
                         </td>
                         <td className="py-3 pl-4 font-mono text-slate-400">

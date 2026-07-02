@@ -77,7 +77,7 @@ export default function ObservabilityPage() {
 
   if (error) {
     return (
-      <div className="p-6 bg-red-500/10 border border-red-500/20 text-red-200 rounded-2xl flex items-start gap-3">
+      <div className="p-6 bg-red-500/10 border border-red-500/20 text-red-600 rounded-2xl flex items-start gap-3">
         <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
         <div>
           <h3 className="font-semibold text-sm">Error Loading Observability</h3>
@@ -98,10 +98,10 @@ export default function ObservabilityPage() {
       {/* Title */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Observability</h1>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Observability</h1>
           <p className="text-sm text-slate-400 mt-1">Detailed tracing spend, response speeds, and system latency</p>
         </div>
-        <div className="flex items-center gap-1 text-xs text-indigo-400 font-semibold uppercase tracking-wider bg-indigo-500/5 px-3 py-1.5 rounded-xl border border-indigo-500/10">
+        <div className="flex items-center gap-1 text-xs text-[#7C3AED] font-semibold uppercase tracking-wider bg-purple-50 px-3 py-1.5 rounded-xl border border-purple-100">
           <Activity className="w-4 h-4 animate-pulse" />
           <span>Active tracing</span>
         </div>
@@ -112,14 +112,14 @@ export default function ObservabilityPage() {
         {latencyBarData.map((item, i) => (
           <div
             key={item.name}
-            className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm"
+            className="p-6 rounded-2xl bg-white border border-slate-200 backdrop-blur-sm"
           >
             <span className="text-xs text-slate-500 font-semibold">{item.name}</span>
             <div className="flex items-baseline gap-1 mt-2">
-              <span className="text-3xl font-extrabold text-white">{item.value.toFixed(2)}</span>
+              <span className="text-3xl font-extrabold text-slate-800">{item.value.toFixed(2)}</span>
               <span className="text-xs text-slate-500 font-medium">seconds</span>
             </div>
-            <div className="w-full h-1 bg-slate-850 rounded-full mt-4 overflow-hidden">
+            <div className="w-full h-1 bg-slate-200 rounded-full mt-4 overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{
@@ -135,10 +135,10 @@ export default function ObservabilityPage() {
       {/* Observability charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Cost aggregation area chart */}
-        <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+        <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-semibold text-sm text-white">Daily Cost Aggregation</h3>
+              <h3 className="font-semibold text-sm text-slate-800">Daily Cost Aggregation</h3>
               <p className="text-[11px] text-slate-500 mt-0.5">Total spend is ${(totalSpend || 0).toFixed(4)}</p>
             </div>
             <div className="flex items-center gap-0.5 text-xs text-emerald-400 font-bold uppercase tracking-wider">
@@ -157,7 +157,7 @@ export default function ObservabilityPage() {
                       <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis
                     dataKey="date"
                     stroke="#64748b"
@@ -197,7 +197,7 @@ export default function ObservabilityPage() {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20">
+              <div className="h-full flex items-center justify-center text-slate-500 text-xs border border-dashed border-slate-200 rounded-xl bg-[#f4f2ff]/20">
                 No billing history recorded yet
               </div>
             )}
@@ -205,13 +205,13 @@ export default function ObservabilityPage() {
         </div>
 
         {/* Latency percentiles distribution chart */}
-        <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm">
+        <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-semibold text-sm text-white">Latency Percentiles Distribution</h3>
+              <h3 className="font-semibold text-sm text-slate-800">Latency Percentiles Distribution</h3>
               <p className="text-[11px] text-slate-500 mt-0.5">Response latency in seconds</p>
             </div>
-            <div className="flex items-center gap-0.5 text-xs text-indigo-400 font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-0.5 text-xs text-[#7C3AED] font-bold uppercase tracking-wider">
               <Clock className="w-4 h-4 animate-spin" style={{ animationDuration: '6s' }} />
               <span>Response times</span>
             </div>
@@ -221,7 +221,7 @@ export default function ObservabilityPage() {
             {latency?.p50 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={latencyBarData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis
                     stroke="#64748b"
@@ -248,7 +248,7 @@ export default function ObservabilityPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-slate-950/20">
+              <div className="h-full flex items-center justify-center text-slate-500 text-xs border border-dashed border-slate-200 rounded-xl bg-[#f4f2ff]/20">
                 No latency records logged yet
               </div>
             )}

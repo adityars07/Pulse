@@ -174,7 +174,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
       case 'READY':
         return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
       case 'PROCESSING':
-        return <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" />;
+        return <Loader2 className="w-4 h-4 text-[#7C3AED] animate-spin" />;
       case 'FAILED':
         return <AlertCircle className="w-4 h-4 text-red-400" />;
       case 'ARCHIVED':
@@ -189,7 +189,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
       case 'READY':
         return 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400';
       case 'PROCESSING':
-        return 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400';
+        return 'bg-purple-50 border-purple-100 text-[#7C3AED]';
       case 'FAILED':
         return 'bg-red-500/10 border-red-500/20 text-red-400';
       case 'ARCHIVED':
@@ -218,11 +218,11 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
   if (error || !source) {
     return (
       <div className="space-y-6">
-        <Link href="/sources" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors">
+        <Link href="/sources" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-800 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Knowledge Base</span>
         </Link>
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-200 text-sm rounded-2xl flex items-center gap-2">
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-600 text-sm rounded-2xl flex items-center gap-2">
           <AlertCircle className="w-5 h-5 shrink-0" />
           <span>{error || 'Source not found.'}</span>
         </div>
@@ -234,7 +234,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
     <div className="space-y-8">
       {/* Navigation & Header */}
       <div className="space-y-4">
-        <Link href="/sources" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors">
+        <Link href="/sources" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-800 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Knowledge Base</span>
         </Link>
@@ -242,7 +242,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-white tracking-tight">{source.name}</h1>
+              <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{source.name}</h1>
               <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-semibold ${getStatusBadgeClass(source.status)}`}>
                 {getStatusIcon(source.status)}
                 <span>{source.status}</span>
@@ -250,7 +250,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
             </div>
             <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-3">
               <span className="flex items-center gap-1">
-                {source.type === 'URL' ? <Globe className="w-3.5 h-3.5 text-purple-400" /> : <FileText className="w-3.5 h-3.5 text-indigo-400" />}
+                {source.type === 'URL' ? <Globe className="w-3.5 h-3.5 text-purple-400" /> : <FileText className="w-3.5 h-3.5 text-[#7C3AED]" />}
                 <span>{source.type}</span>
               </span>
               <span>•</span>
@@ -274,8 +274,8 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all ${
                 viewMode === 'content'
-                  ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
-                  : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-purple-50 border-purple-200 text-[#7C3AED]'
+                  : 'bg-white border-slate-200 text-slate-400 hover:text-slate-800'
               }`}
             >
               <Eye className="w-3.5 h-3.5" />
@@ -298,10 +298,10 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
       {/* Main Workspace layout */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 items-start">
         {/* Left column: Version History Timeline */}
-        <div className="xl:col-span-1 p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm space-y-4">
+        <div className="xl:col-span-1 p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm space-y-4">
           <div className="flex items-center gap-2 mb-2">
-            <History className="w-4 h-4 text-indigo-400" />
-            <h3 className="font-semibold text-sm text-white">Version History</h3>
+            <History className="w-4 h-4 text-[#7C3AED]" />
+            <h3 className="font-semibold text-sm text-slate-800">Version History</h3>
           </div>
 
           {loadingHistory ? (
@@ -312,7 +312,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
           ) : history.length <= 1 ? (
             <p className="text-xs text-slate-500">No previous versions available for this source.</p>
           ) : (
-            <div className="relative border-l border-slate-800 pl-4 ml-2 space-y-5">
+            <div className="relative border-l border-slate-200 pl-4 ml-2 space-y-5">
               {history.map((hist) => {
                 const isCurrent = hist.id === source.id;
                 const isSelectedForCompare = hist.id === compareSource?.id;
@@ -326,14 +326,14 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
                           ? 'bg-indigo-500 border-indigo-500 shadow-md shadow-indigo-500/30 scale-110'
                           : isSelectedForCompare
                           ? 'bg-purple-500 border-purple-500 scale-110'
-                          : 'bg-slate-950 border-slate-700 group-hover:border-slate-500'
+                          : 'bg-[#f4f2ff] border-slate-200 group-hover:border-slate-500'
                       }`}
                     />
 
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className={`text-xs font-bold ${isCurrent ? 'text-white' : 'text-slate-300'}`}>
-                          Version {hist.version} {isCurrent && <span className="text-[9px] text-indigo-400 font-semibold ml-1">(active)</span>}
+                        <span className={`text-xs font-bold ${isCurrent ? 'text-slate-800' : 'text-slate-600'}`}>
+                          Version {hist.version} {isCurrent && <span className="text-[9px] text-[#7C3AED] font-semibold ml-1">(active)</span>}
                         </span>
                         <span className="text-[10px] text-slate-500">
                           {new Date(hist.createdAt).toLocaleDateString()}
@@ -350,7 +350,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
                             className={`text-[9px] font-semibold px-2 py-0.5 rounded border transition-colors ${
                               isSelectedForCompare
                                 ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'
-                                : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                                : 'bg-[#f4f2ff] border-slate-200 text-slate-400 hover:text-slate-800 hover:border-slate-200'
                             }`}
                           >
                             {isSelectedForCompare ? 'Cancel Compare' : 'Compare'}
@@ -366,12 +366,12 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
         </div>
 
         {/* Right column: Content View or Diff View */}
-        <div className="xl:col-span-3 p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm min-h-[400px]">
+        <div className="xl:col-span-3 p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm min-h-[400px]">
           {viewMode === 'content' ? (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-white">Parsed Document Content</h3>
-                <span className="text-xs text-indigo-400 font-semibold">{chunks.length} chunks indexed</span>
+                <h3 className="font-semibold text-sm text-slate-800">Parsed Document Content</h3>
+                <span className="text-xs text-[#7C3AED] font-semibold">{chunks.length} chunks indexed</span>
               </div>
 
               {loadingChunks ? (
@@ -380,22 +380,22 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
                   <span>Loading chunks...</span>
                 </div>
               ) : chunks.length === 0 ? (
-                <div className="py-12 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl">
+                <div className="py-12 text-center text-slate-500 text-xs border border-dashed border-slate-200 rounded-xl">
                   No chunks indexed for this version.
                 </div>
               ) : (
                 <div className="space-y-4">
                   {chunks.map((chunk, index) => (
-                    <div key={chunk.id} className="p-4 bg-slate-950/60 border border-slate-850 rounded-xl space-y-2 group hover:border-slate-800 transition-colors">
+                    <div key={chunk.id} className="p-4 bg-[#f4f2ff]/60 border border-slate-200 rounded-xl space-y-2 group hover:border-slate-200 transition-colors">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/5 px-2 py-0.5 rounded border border-indigo-500/10">
+                        <span className="text-[10px] font-bold text-[#7C3AED] bg-purple-50 px-2 py-0.5 rounded border border-purple-100">
                           Chunk #{index + 1}
                         </span>
                         <span className="text-[9px] text-slate-500 font-mono">
                           {chunk.tokenCount} tokens
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-wrap">
+                      <p className="text-xs text-slate-600 leading-relaxed font-sans whitespace-pre-wrap">
                         {chunk.content}
                       </p>
                     </div>
@@ -405,9 +405,9 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-850 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div>
-                  <h3 className="font-semibold text-sm text-white flex items-center gap-1.5">
+                  <h3 className="font-semibold text-sm text-slate-800 flex items-center gap-1.5">
                     <GitCompare className="w-4 h-4 text-purple-400" />
                     <span>Version Comparison Diff</span>
                   </h3>
@@ -434,11 +434,11 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
                   <span>Generating diff analysis...</span>
                 </div>
               ) : diffResult.length === 0 ? (
-                <div className="py-12 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl">
+                <div className="py-12 text-center text-slate-500 text-xs border border-dashed border-slate-200 rounded-xl">
                   No textual differences detected between these two versions.
                 </div>
               ) : (
-                <div className="bg-slate-950 rounded-xl border border-slate-850 p-4 font-mono text-[11px] leading-relaxed overflow-x-auto max-h-[600px] overflow-y-auto space-y-0.5">
+                <div className="bg-[#f4f2ff] rounded-xl border border-slate-200 p-4 font-mono text-[11px] leading-relaxed overflow-x-auto max-h-[600px] overflow-y-auto space-y-0.5">
                   {diffResult.map((change, index) => {
                     if (change.type === 'added') {
                       return (

@@ -106,11 +106,11 @@ export default function ConversationDetailPage() {
   if (error || !conversation) {
     return (
       <div className="space-y-4">
-        <Link href="/conversations" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white font-semibold">
+        <Link href="/conversations" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-800 font-semibold">
           <ArrowLeft className="w-4 h-4" />
           <span>Back to conversations</span>
         </Link>
-        <div className="p-6 bg-red-500/10 border border-red-500/20 text-red-200 rounded-2xl flex items-start gap-3">
+        <div className="p-6 bg-red-500/10 border border-red-500/20 text-red-600 rounded-2xl flex items-start gap-3">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <div>
             <h3 className="font-semibold text-sm">Error Loading Chat</h3>
@@ -126,16 +126,16 @@ export default function ConversationDetailPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex items-center justify-between border-b border-slate-800/60 pb-5">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-5">
         <div className="flex items-center gap-4">
           <Link
             href="/conversations"
-            className="p-1.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-white transition-all active:scale-95"
+            className="p-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-700 transition-all active:scale-95"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">Conversation Logs</h1>
+            <h1 className="text-xl font-bold text-slate-800 tracking-tight">Conversation Logs</h1>
             <p className="text-xs text-slate-500 mt-0.5">ID: {conversation.id}</p>
           </div>
         </div>
@@ -153,8 +153,8 @@ export default function ConversationDetailPage() {
                     ? 'bg-emerald-500/15 border-emerald-500/35 text-emerald-400'
                     : status === 'ESCALATED'
                     ? 'bg-amber-500/15 border-amber-500/35 text-amber-400'
-                    : 'bg-indigo-500/15 border-indigo-500/35 text-indigo-400'
-                  : 'bg-slate-950 border-slate-850 text-slate-500 hover:text-slate-300'
+                    : 'bg-purple-50 border-indigo-500/35 text-[#7C3AED]'
+                  : 'bg-[#f4f2ff] border-slate-200 text-slate-500 hover:text-slate-600'
               }`}
             >
               {status}
@@ -178,12 +178,12 @@ export default function ConversationDetailPage() {
                 <div
                   className={`max-w-[85%] p-4 rounded-2xl border ${
                     isAssistant
-                      ? 'bg-slate-900/50 border-slate-800/80 text-slate-100 rounded-tr-none'
-                      : 'bg-indigo-500/10 border-indigo-500/20 text-slate-100 rounded-tl-none'
+                      ? 'bg-white border-slate-200 text-slate-700 rounded-tr-none'
+                      : 'bg-purple-50 border-purple-100 text-slate-700 rounded-tl-none'
                   }`}
                 >
                   {/* Speaker Label */}
-                  <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${isAssistant ? 'text-indigo-400' : 'text-slate-400'}`}>
+                  <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${isAssistant ? 'text-[#7C3AED]' : 'text-slate-400'}`}>
                     {isAssistant ? 'AI Assistant' : 'User'}
                   </span>
                   
@@ -192,7 +192,7 @@ export default function ConversationDetailPage() {
 
                   {/* Assistant Stats (Confidence/Latency/Cost) */}
                   {isAssistant && (message.confidence !== null || message.latencyMs !== null || message.tokenCost !== null) && (
-                    <div className="mt-4 pt-3 border-t border-slate-800/40 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[9px] text-slate-500">
+                    <div className="mt-4 pt-3 border-t border-slate-200/40 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[9px] text-slate-500">
                       {message.confidence !== null && (
                         <span className="flex items-center gap-1">
                           <Cpu className="w-3 h-3 text-slate-600" />
@@ -216,17 +216,17 @@ export default function ConversationDetailPage() {
 
                   {/* Citations block */}
                   {isAssistant && message.citations && message.citations.length > 0 && (
-                    <div className="mt-4 pt-3 border-t border-slate-800/40 space-y-2">
+                    <div className="mt-4 pt-3 border-t border-slate-200/40 space-y-2">
                       <span className="flex items-center gap-1 text-[9px] text-slate-400 font-bold uppercase tracking-wider">
                         <Bookmark className="w-3 h-3 text-slate-500" />
                         <span>Sources Referenced</span>
                       </span>
                       <div className="grid grid-cols-1 gap-2 mt-1">
                         {message.citations.map((cite, i) => (
-                          <div key={cite.chunkId} className="p-2 bg-slate-950/60 border border-slate-850 rounded-lg text-[10px]">
+                          <div key={cite.chunkId} className="p-2 bg-[#f4f2ff]/60 border border-slate-200 rounded-lg text-[10px]">
                             <div className="flex justify-between items-center text-[9px] text-slate-500 font-semibold mb-1">
                               <span>Source: {cite.sourceName}</span>
-                              <span className="text-indigo-400">Relevance: {Math.round(cite.relevanceScore * 100)}%</span>
+                              <span className="text-[#7C3AED]">Relevance: {Math.round(cite.relevanceScore * 100)}%</span>
                             </div>
                             <p className="text-slate-400 leading-normal line-clamp-2 italic">&quot;{cite.content}&quot;</p>
                           </div>
@@ -249,14 +249,14 @@ export default function ConversationDetailPage() {
         </div>
 
         {/* Conversation Sidebar Info */}
-        <div className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl backdrop-blur-sm space-y-6">
-          <h3 className="font-semibold text-sm text-white">Conversation Meta</h3>
+        <div className="p-6 bg-white border border-slate-200 rounded-2xl backdrop-blur-sm space-y-6">
+          <h3 className="font-semibold text-sm text-slate-800">Conversation Meta</h3>
 
           <div className="space-y-4 divide-y divide-slate-800/60">
             {/* Meta values */}
             <div className="flex items-center justify-between py-2 first:pt-0 text-xs">
               <span className="text-slate-400">Total Tokens Cost</span>
-              <span className="font-bold text-white flex items-center gap-0.5 text-indigo-400">
+              <span className="font-bold text-slate-800 flex items-center gap-0.5 text-[#7C3AED]">
                 <DollarSign className="w-3.5 h-3.5" />
                 <span>${totalCost.toFixed(5)}</span>
               </span>
@@ -264,7 +264,7 @@ export default function ConversationDetailPage() {
 
             <div className="flex items-center justify-between py-3 text-xs">
               <span className="text-slate-400">Visitor IP</span>
-              <span className="font-semibold text-slate-200">{conversation.visitorInfo?.ip || 'Local IP'}</span>
+              <span className="font-semibold text-slate-700">{conversation.visitorInfo?.ip || 'Local IP'}</span>
             </div>
 
             <div className="flex flex-col gap-1.5 py-3 text-xs">
@@ -276,7 +276,7 @@ export default function ConversationDetailPage() {
 
             <div className="flex items-center justify-between py-3 text-xs">
               <span className="text-slate-400">Session Started</span>
-              <span className="font-semibold text-slate-200 flex items-center gap-1">
+              <span className="font-semibold text-slate-700 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-slate-500" />
                 <span>
                   {new Date(conversation.createdAt).toLocaleDateString(undefined, {

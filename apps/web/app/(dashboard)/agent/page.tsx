@@ -53,8 +53,8 @@ export default function AgentInboxPage() {
       {/* Sidebar — escalated list */}
       <aside className="w-80 flex-shrink-0 flex flex-col gap-2 overflow-y-auto">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-lg font-semibold text-slate-100">Agent Inbox</h1>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 font-medium">
+          <h1 className="text-lg font-semibold text-slate-700">Agent Inbox</h1>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-red-50 border border-red-200 text-red-600 font-bold uppercase tracking-wider">
             {conversations.length} escalated
           </span>
         </div>
@@ -75,22 +75,22 @@ export default function AgentInboxPage() {
             key={conv.id}
             id={`escalated-conv-${conv.id.slice(0, 8)}`}
             onClick={() => setSelected(conv.id)}
-            className={`w-full text-left p-3 rounded-xl border transition-all ${
+            className={`w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
               selected === conv.id
-                ? 'border-indigo-500 bg-indigo-950/40'
-                : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
+                ? 'border-[#7C3AED] bg-purple-50/50 shadow-sm'
+                : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
             }`}
           >
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-sm font-medium text-slate-200 truncate">
+                <p className="text-sm font-bold text-slate-800 truncate">
                   Session: {conv.sessionId.slice(0, 12)}…
                 </p>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[10px] text-slate-400 mt-1 font-medium">
                   Updated {new Date(conv.updatedAt).toLocaleTimeString()}
                 </p>
               </div>
-              <span className="flex-shrink-0 text-xs px-1.5 py-0.5 rounded-md bg-red-500/20 text-red-400">
+              <span className="flex-shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-50 border border-red-200 text-red-600 tracking-wider">
                 LIVE
               </span>
             </div>
